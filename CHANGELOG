@@ -1,0 +1,11 @@
+19.07
+=========================================================================================================
+
+- Dodalem funkcje w mcda_functions debug_weights_and_criteria(weights_file_path, criteria, poi_indices, criteria_types):
+- Dodalem plik P9_EV.py ktory jest przykladem 9 uzycia. Stacje EV  
+- Poprawilem Merge poi w MCDA functions
+
+
+Note:
+Popraw swoje funkcje bo mozliwe ze jezeli cos mergowales to bylo to zle zrobione, zrob jeszcze raz rancom i jeszce raz recznie ustaw typy (Patrz rowery bo sa poprawione i teraz poprawnie sie lacza te punkty)
+=========================================================================================================

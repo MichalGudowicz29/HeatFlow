@@ -14,6 +14,17 @@ from pymcdm.weights.subjective.rancom import RANCOM
 np.set_printoptions(precision=4, suppress=True, linewidth=1000)
 
 
+def make_rancom_weights(criteria_names: List[str], weights_file_path: str) -> None:
+    """
+    Makes weights for the RANCOM method.
+    """
+    rancom_object_names = [crit_def for crit_def in criteria_names]
+    print(rancom_object_names)
+    rancom = RANCOM(object_names=rancom_object_names)
+    weights = rancom()
+    rancom.to_csv(weights_file_path)
+    
+
 def count(lat: float, lon: float, tag_key: str, tag_value: str, 
           radius: int = 500, max_retries: int = 5, delay: float = 1.0) -> int:
     """
@@ -350,30 +361,29 @@ def process_points_in_chunks(points_list: List[Tuple[float, float]],
     
 #     return [(float(point[0]), float(point[1])) for point in pts]
 
-
-def merge_poi_criteria(alts: np.ndarray, poi_indices: List[int]) -> np.ndarray:
-    """
-    Merges selected POI criteria into a single aggregated criterion.
-    
-    Sums the values of selected columns (criteria) and creates a new matrix with combined
-    criteria. Used to reduce the number of criteria by grouping similar concepts.
-    
-    Args:
-        alts (np.ndarray): Matrix of alternatives with all criteria
-        poi_indices (List[int]): Indices of columns to sum
-    
-    Returns:
-        np.ndarray: New matrix with the first 3 criteria, summed POIs, and the last criterion
-        
-    Example:
-        >>> alts = np.array([[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12]])
-        >>> merge_poi_criteria(alts, [3, 4])
-        array([[ 1,  2,  3,  9,  6],
-               [ 7,  8,  9, 21, 12]])
-    """
-    merged_poi = alts[:, poi_indices].sum(axis=1)
-    
-    return np.column_stack((alts[:, :3], merged_poi, alts[:, -1]))
+def merge_poi_criteria(alts: np.ndarray, poi_indices: list, criteria_names: list = None) -> np.ndarray:
+    poi_indices = sorted(poi_indices)
+    if criteria_names is not None:
+        print("Kryteria przed mergowaniem:")
+        for i, name in enumerate(criteria_names):
+            print(f"  {i}: {name}")
+        print("Mergowane kryteria:")
+        for i in poi_indices:
+            print(f"  {i}: {criteria_names[i]}")
+    merged_col = alts[:, poi_indices].sum(axis=1, keepdims=True)
+    non_poi_indices = [i for i in range(alts.shape[1]) if i not in poi_indices]
+    left = [i for i in non_poi_indices if i < poi_indices[0]]
+    right = [i for i in non_poi_indices if i >= poi_indices[0]]
+    left_cols = alts[:, left]
+    right_cols = alts[:, right]
+    result = np.hstack([left_cols, merged_col, right_cols])
+    if criteria_names is not None:
+        merged_name = " + ".join([criteria_names[i] for i in poi_indices])
+        new_names = [criteria_names[i] for i in left] + [merged_name] + [criteria_names[i] for i in right]
+        print("Kryteria po mergowaniu:")
+        for i, name in enumerate(new_names):
+            print(f"  {i}: {name}")
+    return result
 
 
 def calculate_bounds(data: np.ndarray, tolerance: float = 0.1) -> np.ndarray:
@@ -482,15 +492,18 @@ def analyze_locations(points: List[Tuple[float, float]],
     alts = process_points_in_chunks(points, criteria, chunk_size, radius, delay, chunk_delay, cache_file)
     
     # 2. Merging POI criteria (if provided)
+    # print('[DEBUG] altdds shape przed merge:', alts.shape, 'sample:', alts[:2])
+    # print('[DEBUG] poi_indices:', poi_indices)
     if poi_indices:
-        alts_final = merge_poi_criteria(alts, poi_indices)
+        alts_final = merge_poi_criteria(alts, poi_indices, [c['name'] for c in criteria])        # print('[DEBUG] alts shape po merge:', alts_final.shape, 'sample:', alts_final[:2])
     else:
         alts_final = alts
-    
+    # print('[DEBUG] alts_final shape:', alts_final.shape, 'sample:', alts_final[:2])
     # 3. Loading weights
     rancom = RANCOM(filename=weights_file)
     weights = rancom()
-    
+    # print('[DEBUG] weights shape:', weights.shape, 'values:', weights[:10])
+    # print('[DEBUG] criteria_types shape:', criteria_types.shape, 'values:', criteria_types)
     # 4. SPOTIS analysis
     bounds = calculate_bounds(alts_final)
     spotis = SPOTIS(bounds)

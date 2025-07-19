@@ -1,7 +1,7 @@
 from functions.map_functions import plot_heatmap, plot_points, generate_points, summary
-from functions.math_functions import interpolate
-from functions.mcda_functions import analyze_locations
+from functions.mcda_functions import analyze_locations, make_rancom_weights
 import numpy as np
+import os
 
 # Configuration
 # Coordinates
@@ -104,7 +104,20 @@ BIKE_POINTS_NAMES = [
 ]
 
 POI_INDICES = [3, 5, 6, 7, 8]  # supermarkets, offices, restaurants, fast food, attractions
-CRITERIA_TYPES = np.array([1, 1, -1, 1, 1])  # after merging POI
+CRITERIA_TYPES = np.array([1, 1, -1, 1, 1, 1])  # after merging POI
+
+weights_file_path = "data/as_rancom.csv"
+merged_criteria_names = [
+    "Number of public transport stops",
+    "Number of university areas",
+    "Bike paths",
+    "POI",
+    "Number of parks nearby",
+    "Residential building density"
+]
+
+if not os.path.exists(weights_file_path):
+    make_rancom_weights(merged_criteria_names, weights_file_path)
 
 def main():
     """

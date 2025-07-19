@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.io.img_tiles as cimgt
 from geopy.distance import geodesic
-from scipy.interpolate import RBFInterpolator, griddata
 from scipy.stats import gaussian_kde
 from functions.math_functions import interpolate
 
@@ -206,3 +205,6 @@ def summary(lat0, lat1, lon0, lon1, points, score):
     print(f"Number of score values: {len(score)}")
     print(f"Average score: {np.mean(score):.4f}")
     print(20*"=")
+
+
+
