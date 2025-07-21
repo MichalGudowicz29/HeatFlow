@@ -20,7 +20,6 @@ def main():
     points = generate_points(lat0, lat1, lon0, lon1, distance_per_point)
     names = [f"Point_{i}" for i in range(len(points))]
     points_lat_lon = [(p[1], p[0]) for p in points]
-    names = [f"Point_{i}" for i in range(len(points))]
 
     preferences, ranking = analyze_locations(
         points=points_lat_lon,

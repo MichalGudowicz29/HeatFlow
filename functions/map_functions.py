@@ -5,6 +5,12 @@ import cartopy.io.img_tiles as cimgt
 from geopy.distance import geodesic
 from scipy.stats import gaussian_kde
 from functions.math_functions import interpolate
+import datetime
+import re
+import os
+
+
+
 
 def get_projection(projection):
     """
@@ -28,7 +34,7 @@ def get_projection(projection):
     return projection
 
 def plot_heatmap(points, score, method='rbf', title="Heatmap", 
-                alpha=0.6, osm_zoom=14, projection='platecarree', grid_resolution=200, padding=0.01):
+                alpha=0.6, osm_zoom=14, projection='platecarree', grid_resolution=200, padding=0.01, save_path=None):
     """
     Plots a heatmap of given points and scores using the specified interpolation method.
 
@@ -42,6 +48,7 @@ def plot_heatmap(points, score, method='rbf', title="Heatmap",
         projection (str or cartopy.crs.Projection): Map projection to use.
         grid_resolution (int): Grid resolution for interpolation.
         padding (float): Padding for plot extent.
+        save_path(str): Save heatmap to path
 
     Returns:
         None
@@ -94,15 +101,32 @@ def plot_heatmap(points, score, method='rbf', title="Heatmap",
     
     # Add colorbar
     cbar = fig.colorbar(pcm, ax=ax, orientation='vertical', pad=0.05, aspect=20)
-    cbar.set_label('higher = better')
+    cbar.set_label('lower = better')
     
     # Add gridlines
     gl = ax.gridlines(draw_labels=True, dms=True, x_inline=False, y_inline=False, alpha=0.3)
     gl.top_labels = False
     gl.right_labels = False
     
+
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M")  
+    sanitized_title = re.sub(r'[^\w\s]', '', title).replace(' ', '_')
+    output_prefix = f"{sanitized_title}_{timestamp}"
+
+    if save_path:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"[INFO] Saved heatmap to {save_path}")
+    else:
+        # Fallback filename if save_path is not provided
+        default_save_path = f"output/{output_prefix}_heatmap.png"
+        os.makedirs(os.path.dirname(default_save_path), exist_ok=True)
+        plt.savefig(default_save_path, dpi=300, bbox_inches='tight')
+        print(f"[INFO] Saved heatmap to {default_save_path}")
+
     plt.tight_layout()
     plt.show()
+
 
 def plot_points(points, title="Points on OSM", osm_zoom=14, projection='platecarree'):
     """

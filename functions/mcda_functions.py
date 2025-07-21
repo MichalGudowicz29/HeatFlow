@@ -464,7 +464,7 @@ def analyze_locations(points: List[Tuple[float, float]],
                      export_results: bool = True,
                      **kwargs) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Main function for location analysis
+    Main function for location analysis.
     
     Args:
         points: List of points (lat, lon) to analyze
@@ -487,40 +487,49 @@ def analyze_locations(points: List[Tuple[float, float]],
     chunk_delay = kwargs.get('chunk_delay', 5.0)
     cache_file = kwargs.get('cache_file', f'{output_prefix}_cache.json')
 
-
     # 1. Data processing
     alts = process_points_in_chunks(points, criteria, chunk_size, radius, delay, chunk_delay, cache_file)
-    
+    print(f"[DEBUG] alts shape: {alts.shape}, sample: {alts[:2]}")  # Debug: wymiary i próbka alts
+
     # 2. Merging POI criteria (if provided)
-    # print('[DEBUG] altdds shape przed merge:', alts.shape, 'sample:', alts[:2])
-    # print('[DEBUG] poi_indices:', poi_indices)
     if poi_indices:
-        alts_final = merge_poi_criteria(alts, poi_indices, [c['name'] for c in criteria])        # print('[DEBUG] alts shape po merge:', alts_final.shape, 'sample:', alts_final[:2])
+        print(f"[DEBUG] Merging POI criteria with indices: {poi_indices}")
+        alts_final = merge_poi_criteria(alts, poi_indices, [c['name'] for c in criteria])
+        print(f"[DEBUG] After merging, alts_final shape: {alts_final.shape}, sample: {alts_final[:2]}")
     else:
+        print(f"[DEBUG] No POI merging (poi_indices is {poi_indices})")
         alts_final = alts
-    # print('[DEBUG] alts_final shape:', alts_final.shape, 'sample:', alts_final[:2])
+        print(f"[DEBUG] alts_final shape (no merging): {alts_final.shape}, sample: {alts_final[:2]}")
     # 3. Loading weights
     rancom = RANCOM(filename=weights_file)
     weights = rancom()
-    # print('[DEBUG] weights shape:', weights.shape, 'values:', weights[:10])
-    # print('[DEBUG] criteria_types shape:', criteria_types.shape, 'values:', criteria_types)
-    # 4. SPOTIS analysis
+    print(f"[DEBUG] Weights loaded from {weights_file}: {weights}, shape: {weights.shape}")
+
+    # 4. Validate dimensions
+    expected_num_criteria = alts_final.shape[1]
+    print(f"[DEBUG] Expected number of criteria: {expected_num_criteria}")
+    print(f"[DEBUG] criteria_types: {criteria_types}, shape: {criteria_types.shape}")
+    if len(criteria_types) != expected_num_criteria:
+        raise ValueError(f"Dimension mismatch: criteria_types has {len(criteria_types)} elements, "
+                         f"but alts_final has {expected_num_criteria} columns")
+    if len(weights) != expected_num_criteria:
+        raise ValueError(f"Dimension mismatch: weights has {len(weights)} elements, "
+                         f"but alts_final has {expected_num_criteria} columns")
+
+    # 5. SPOTIS analysis
     bounds = calculate_bounds(alts_final)
+    print(f"[DEBUG] Bounds shape: {bounds.shape}, sample: {bounds}")
     spotis = SPOTIS(bounds)
     preferences = spotis(alts_final, weights, criteria_types)
     ranking = spotis.rank(preferences)
-    
-    # 5. Display results for debugging?
-    # for i in range(min(3, len(ranking))):
-    #     idx = int(ranking[i] - 1)  # ranking is 1-indexed, convert to int
-    #     print(f"  {i+1}. {points_names[idx]} (preference: {preferences[idx]:.4f})")
-    
+    print(f"[DEBUG] Preferences shape: {preferences.shape}, sample: {preferences[:2]}")
+    print(f"[DEBUG] Ranking shape: {ranking.shape}, sample: {ranking[:2]}")
+
     # 6. Export results
     if export_results:
         export_results(preferences, ranking, points_names, output_prefix)
     
     return preferences, ranking
-
 
 
 # if __name__ == "__main__":
