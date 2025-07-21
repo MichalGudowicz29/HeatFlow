@@ -34,7 +34,7 @@ def get_projection(projection):
     return projection
 
 def plot_heatmap(points, score, method='rbf', title="Heatmap", 
-                alpha=0.6, osm_zoom=14, projection='platecarree', grid_resolution=200, padding=0.01, save_path=None):
+                alpha=0.4, osm_zoom=14, projection='platecarree', grid_resolution=200, padding=0.00, save_path=None):
     """
     Plots a heatmap of given points and scores using the specified interpolation method.
 

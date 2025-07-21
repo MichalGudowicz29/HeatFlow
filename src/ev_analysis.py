@@ -59,7 +59,7 @@ def main():
     preferences = preferences.tolist()
 
     # Plot heatmap with timestamped filename
-    heatmap_title = "title"
+    heatmap_title = "EV stations heatmap analysis"
     plot_heatmap(
         points,
         preferences,
