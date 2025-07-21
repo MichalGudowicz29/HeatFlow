@@ -106,7 +106,7 @@ BIKE_POINTS_NAMES = [
 POI_INDICES = [3, 5, 6, 7, 8]  # supermarkets, offices, restaurants, fast food, attractions
 CRITERIA_TYPES = np.array([1, 1, -1, 1, 1, 1])  # after merging POI
 
-weights_file_path = "data/as_rancom.csv"
+weights_file_path = "../data/as_rancom.csv"
 merged_criteria_names = [
     "Number of public transport stops",
     "Number of university areas",
@@ -139,7 +139,7 @@ def main():
         points_names=names,
         criteria=BIKE_CRITERIA,
         criteria_types=CRITERIA_TYPES,
-        weights_file="data/as_rancom.csv",
+        weights_file="../data/as_rancom.csv",
         poi_indices=POI_INDICES,
         output_prefix="bike_analysis",
         export_results=False,

@@ -29,7 +29,7 @@ def main():
     """
     Main function. Loads stops, prints top 10, plots heatmaps and statistics.
     """
-    stops = extract_stops_from_json('data/departures_all_stops.json')
+    stops = extract_stops_from_json('../data/departures_all_stops.json')
     filtered = [s for s in stops if s['dep_count'] > 0]
 
     # Convert to (lon, lat) format for plotting

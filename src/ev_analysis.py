@@ -1,19 +1,17 @@
 import datetime
 import os
 import re
-from functions.mcda_functions import load_and_filter_criteria, analyze_locations
-from functions.map_functions import plot_heatmap, plot_points
-from functions.generate_points import generate_points
-from functions.rancom import make_rancom_weights
-from functions.summary import summary
+from functions.mcda_functions import *
+from functions.map_functions import *
+from functions.math_functions import *
 
 # Configuration
-CRITERIA_PATH = "data/criteria.json"
-SELECTED_IDS = ["parking", "primary_roads", "existing_stations", "grocery", "restaurant"]
-lat0, lat1 = 53.401, 53.445
-lon0, lon1 = 14.490, 14.567
+CRITERIA_PATH = "../data/criteria.json"
+SELECTED_IDS = ["parking", "primary_roads", "existing_stations", "shopping", "restaurant", "residential_density"]
+lat0, lat1 = 53.401, 53.445 
+lon0, lon1 = 14.508, 14.587
 distance_per_point = 500  
-weights_file_path = "data/ev_rancom.csv"
+weights_file_path = "../data/ev_rancom.csv"
 
 def main():
     """
@@ -42,6 +40,7 @@ def main():
     points_lat_lon = [(p[1], p[0]) for p in points]
     names = [f"Point_{i}" for i in range(len(points))]
 
+    output_prefix = "ev_analysis"
     # Analyze locations
     preferences, ranking = analyze_locations(
         points=points_lat_lon,
@@ -56,7 +55,6 @@ def main():
         radius=500,
         delay=1.0,
         chunk_delay=5.0,
-        cache_file=cache_file
     )
     preferences = preferences.tolist()
 
@@ -76,7 +74,6 @@ def main():
     plot_points(
         points,
         points_title,
-        save_path=points_filename
     )
 
     # Summary
@@ -84,3 +81,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

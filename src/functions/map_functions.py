@@ -119,7 +119,7 @@ def plot_heatmap(points, score, method='rbf', title="Heatmap",
         print(f"[INFO] Saved heatmap to {save_path}")
     else:
         # Fallback filename if save_path is not provided
-        default_save_path = f"output/{output_prefix}_heatmap.png"
+        default_save_path = f"../output/{output_prefix}_heatmap.png"
         os.makedirs(os.path.dirname(default_save_path), exist_ok=True)
         plt.savefig(default_save_path, dpi=300, bbox_inches='tight')
         print(f"[INFO] Saved heatmap to {default_save_path}")

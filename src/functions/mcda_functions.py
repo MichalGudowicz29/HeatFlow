@@ -213,7 +213,7 @@ def find_nearest_poi(lat: float, lon: float, tag_key: str, tag_value: str,
     return radius
 
 
-def save_cache(data: Dict, filename: str = 'cache/cache.json') -> None:
+def save_cache(data: Dict, filename: str = '../cache/cache.json') -> None:
     """
     Saves data to a cache file in JSON format.
 
@@ -229,7 +229,7 @@ def save_cache(data: Dict, filename: str = 'cache/cache.json') -> None:
         json.dump(data, f, indent=2)
 
 
-def load_cache(filename: str = 'cache/cache.json') -> Dict:
+def load_cache(filename: str = '../cache/cache.json') -> Dict:
     """
     Loads data from a cache file in JSON format.
 
@@ -542,7 +542,7 @@ def analyze_locations(points: List[Tuple[float, float]],
     radius = kwargs.get('radius', 500)
     delay = kwargs.get('delay', 1.0)
     chunk_delay = kwargs.get('chunk_delay', 5.0)
-    cache_file = kwargs.get('cache_file', f'output/{output_prefix}_cache.json')
+    cache_file = kwargs.get('cache_file', f'../output/{output_prefix}_cache.json')
 
     # 1. Data processing
     alts = process_points_in_chunks(points, criteria, chunk_size, radius, delay, chunk_delay, cache_file)
