@@ -34,4 +34,14 @@ if not os.path.exists(weights_file_path):
 co pozwoli co automatycznie sprawdzic czy masz rancom a jak nie to go wywoluje, imo spoko
 
 =========================================================================================================
+21.07 (v2)
 
+- Dodalem zeby json (cache) zapisywal sie w folderze cache/ 
+- TODO: trzeba przemyslec jak zrobic zeby cache zapisywal sie w jednym pliku i teraz problem tez taki ze: 
+    - punkt 54.001 jest inny niz punkt 54.002 i juz bedzie od nowa liczyl w api i zapcha cache, imo mozna zrobic jakis margines bledu do tego
+      tak aby mniej wiecej podobne punkty braly ta sama wartosc. 
+- Dodalem funkcje ktora wyciaga kryteria z criteria.json, jak ktorys brakuje to mozna dodac, 
+- Przyklad uzycia w nowym template
+- UPDATE template.py
+- Mechanizm dzialania mozesz zobaczyc w ev_analysis.py odpalic i zobaczyc kod
+=========================================================================================================

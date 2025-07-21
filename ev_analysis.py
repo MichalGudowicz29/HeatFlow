@@ -10,54 +10,11 @@ lon0, lon1 = 14.508, 14.587
 # Distance between points
 distance_per_point = 500
 
-EV_CRITERIA = [
-        {
-            "name": "Proximity to parking areas",
-            "id": "parking",
-            "method": "distance", 
-            "api_params": ("amenity", "parking"),
-            "type": -1,  # mniejsza odległość = lepiej
-        },
-        {
-            "name": "Proximity to main road",
-            "id": "primary_roads", 
-            "method": "distance",
-            "api_params": ("highway", "primary"),
-            "type": -1,
-        },
-        {
-            "name": "Distance from existing stations",
-            "id": "existing_stations",
-            "method": "distance",
-            "api_params": ("amenity", "charging_station"),
-            "type": 1,  # większa odległość = lepiej (nie za blisko istniejących)
-        },
-        {
-            "name": "Proximity to shopping",
-            "id": "shopping",
-            "method": "distance",
-            "api_params": ("shop", "*"),
-            "type": -1,  # mniejsza odległość = lepiej
-        },
-        {
-            "name": "Restaurant",
-            "id": "restaurant",
-            "method": "distance", 
-            "api_params": ("amenity", "restaurant"),
-            "type": -1,  # mniejsza odległość = lepiej
-        },
-        {
-            "name": "Density od residential",
-            "id": "density_residential",
-            "method": "count",
-            "api_params": ("building", "residential"),
-            "type": 1,  # więcej = lepiej
-        }
-    ]
+ # Criteria IDs you want to use
+SELECTED_IDS = {"parking", "primary_roads", "existing_stations", "shopping", "restaurant", "residential_density"}
+CRITERIA_PATH = "data/criteria.json"
 
-CRITERIA_TYPES = np.array([-1, -1, 1, -1, -1, 1])  
-POI_INDICES = None  # No merging
-
+criteria_list, criteria_types, poi_indices = load_and_filter_criteria(criteria_path=CRITERIA_PATH,selected_ids=SELECTED_IDS,merge=False, merge_id=[]) 
 
 
 weights_file_path = "data/ev_charing.csv"
@@ -93,11 +50,11 @@ def main():
     preferences, ranking = analyze_locations(
         points=points_lat_lon,
         points_names=names,
-        criteria=EV_CRITERIA,
-        criteria_types=CRITERIA_TYPES,
+        criteria=criteria_list,
+        criteria_types=criteria_types,
         weights_file=weights_file_path,
-        poi_indices=POI_INDICES,  # Add this parameter!
-        output_prefix="new_ev_analysis",
+        poi_indices=poi_indices,  # Add this parameter!
+        output_prefix="ev_analysis",
         export_results=False,
         chunk_size=10,
         radius=500,

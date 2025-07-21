@@ -1,0 +1,740 @@
+{
+  "criteria": [
+    {
+      "name": "Proximity to parking areas",
+      "id": "parking",
+      "method": "distance",
+      "api_params": ["amenity", "parking"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to main roads",
+      "id": "primary_roads",
+      "method": "distance",
+      "api_params": ["highway", "primary"],
+      "type": -1
+    },
+    {
+      "name": "Distance from existing charging stations",
+      "id": "existing_stations",
+      "method": "distance",
+      "api_params": ["amenity", "charging_station"],
+      "type": 1
+    },
+    {
+      "name": "Proximity to grocery stores",
+      "id": "grocery",
+      "method": "distance",
+      "api_params": ["shop", "supermarket"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to restaurants",
+      "id": "restaurant",
+      "method": "distance",
+      "api_params": ["amenity", "restaurant"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to cafes",
+      "id": "cafe",
+      "method": "distance",
+      "api_params": ["amenity", "cafe"],
+      "type": -1
+    },
+    {
+      "name": "Residential density",
+      "id": "residential_density",
+      "method": "count",
+      "api_params": ["building", "residential"],
+      "type": 1
+    },
+    {
+      "name": "Proximity to banks",
+      "id": "bank",
+      "method": "distance",
+      "api_params": ["amenity", "bank"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to ATMs",
+      "id": "atm",
+      "method": "distance",
+      "api_params": ["amenity", "atm"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to pharmacies",
+      "id": "pharmacy",
+      "method": "distance",
+      "api_params": ["amenity", "pharmacy"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to hospitals",
+      "id": "hospital",
+      "method": "distance",
+      "api_params": ["amenity", "hospital"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to police stations",
+      "id": "police",
+      "method": "distance",
+      "api_params": ["amenity", "police"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to fire stations",
+      "id": "fire_station",
+      "method": "distance",
+      "api_params": ["amenity", "fire_station"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to schools",
+      "id": "school",
+      "method": "distance",
+      "api_params": ["amenity", "school"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to universities",
+      "id": "university",
+      "method": "distance",
+      "api_params": ["amenity", "university"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to libraries",
+      "id": "library",
+      "method": "distance",
+      "api_params": ["amenity", "library"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to public transport stops",
+      "id": "public_transport",
+      "method": "distance",
+      "api_params": ["public_transport", "stop_position"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to bus stops",
+      "id": "bus_stop",
+      "method": "distance",
+      "api_params": ["highway", "bus_stop"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to tram stops",
+      "id": "tram_stop",
+      "method": "distance",
+      "api_params": ["railway", "tram_stop"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to train stations",
+      "id": "train_station",
+      "method": "distance",
+      "api_params": ["railway", "station"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to hotels",
+      "id": "hotel",
+      "method": "distance",
+      "api_params": ["tourism", "hotel"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to shopping malls",
+      "id": "mall",
+      "method": "distance",
+      "api_params": ["shop", "mall"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to shopping centers",
+      "id": "shopping_center",
+      "method": "distance",
+      "api_params": ["amenity", "shopping_center"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to bakeries",
+      "id": "bakery",
+      "method": "distance",
+      "api_params": ["shop", "bakery"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to clothing stores",
+      "id": "clothing",
+      "method": "distance",
+      "api_params": ["shop", "clothes"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to electronics stores",
+      "id": "electronics",
+      "method": "distance",
+      "api_params": ["shop", "electronics"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to department stores",
+      "id": "department_store",
+      "method": "distance",
+      "api_params": ["shop", "department_store"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to convenience stores",
+      "id": "convenience",
+      "method": "distance",
+      "api_params": ["shop", "convenience"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to hardware stores",
+      "id": "hardware",
+      "method": "distance",
+      "api_params": ["shop", "hardware"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to furniture stores",
+      "id": "furniture",
+      "method": "distance",
+      "api_params": ["shop", "furniture"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to bookstores",
+      "id": "bookstore",
+      "method": "distance",
+      "api_params": ["shop", "books"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to convenience parking",
+      "id": "convenience_parking",
+      "method": "distance",
+      "api_params": ["amenity", "parking"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to car rental",
+      "id": "car_rental",
+      "method": "distance",
+      "api_params": ["amenity", "car_rental"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to car repair",
+      "id": "car_repair",
+      "method": "distance",
+      "api_params": ["amenity", "car_repair"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to car wash",
+      "id": "car_wash",
+      "method": "distance",
+      "api_params": ["amenity", "car_wash"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to fuel stations",
+      "id": "fuel",
+      "method": "distance",
+      "api_params": ["amenity", "fuel"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to EV charging stations",
+      "id": "ev_charging",
+      "method": "distance",
+      "api_params": ["amenity", "charging_station"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to bicycle parking",
+      "id": "bicycle_parking",
+      "method": "distance",
+      "api_params": ["amenity", "bicycle_parking"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to bicycle rental",
+      "id": "bicycle_rental",
+      "method": "distance",
+      "api_params": ["amenity", "bicycle_rental"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to public toilets",
+      "id": "toilets",
+      "method": "distance",
+      "api_params": ["amenity", "toilets"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to drinking water",
+      "id": "drinking_water",
+      "method": "distance",
+      "api_params": ["amenity", "drinking_water"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to fountains",
+      "id": "fountain",
+      "method": "distance",
+      "api_params": ["amenity", "fountain"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to playgrounds",
+      "id": "playground",
+      "method": "distance",
+      "api_params": ["leisure", "playground"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to parks",
+      "id": "park",
+      "method": "distance",
+      "api_params": ["leisure", "park"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to gardens",
+      "id": "garden",
+      "method": "distance",
+      "api_params": ["leisure", "garden"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to sports centers",
+      "id": "sports_centre",
+      "method": "distance",
+      "api_params": ["leisure", "sports_centre"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to gyms",
+      "id": "gym",
+      "method": "distance",
+      "api_params": ["leisure", "fitness_centre"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to swimming pools",
+      "id": "swimming_pool",
+      "method": "distance",
+      "api_params": ["leisure", "swimming_pool"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to golf courses",
+      "id": "golf_course",
+      "method": "distance",
+      "api_params": ["leisure", "golf_course"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to stadiums",
+      "id": "stadium",
+      "method": "distance",
+      "api_params": ["leisure", "stadium"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to cinemas",
+      "id": "cinema",
+      "method": "distance",
+      "api_params": ["amenity", "cinema"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to theaters",
+      "id": "theatre",
+      "method": "distance",
+      "api_params": ["amenity", "theatre"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to museums",
+      "id": "museum",
+      "method": "distance",
+      "api_params": ["tourism", "museum"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to art galleries",
+      "id": "art_gallery",
+      "method": "distance",
+      "api_params": ["tourism", "gallery"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to zoos",
+      "id": "zoo",
+      "method": "distance",
+      "api_params": ["tourism", "zoo"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to aquariums",
+      "id": "aquarium",
+      "method": "distance",
+      "api_params": ["tourism", "aquarium"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to national parks",
+      "id": "national_park",
+      "method": "distance",
+      "api_params": ["boundary", "national_park"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to nature reserves",
+      "id": "nature_reserve",
+      "method": "distance",
+      "api_params": ["leisure", "nature_reserve"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to beaches",
+      "id": "beach",
+      "method": "distance",
+      "api_params": ["natural", "beach"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to forests",
+      "id": "forest",
+      "method": "distance",
+      "api_params": ["natural", "wood"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to lakes",
+      "id": "lake",
+      "method": "distance",
+      "api_params": ["natural", "water"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to rivers",
+      "id": "river",
+      "method": "distance",
+      "api_params": ["natural", "water"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to canals",
+      "id": "canal",
+      "method": "distance",
+      "api_params": ["waterway", "canal"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to bridges",
+      "id": "bridge",
+      "method": "distance",
+      "api_params": ["man_made", "bridge"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to airports",
+      "id": "airport",
+      "method": "distance",
+      "api_params": ["aeroway", "aerodrome"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to railway stations",
+      "id": "railway_station",
+      "method": "distance",
+      "api_params": ["railway", "station"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to ferry terminals",
+      "id": "ferry_terminal",
+      "method": "distance",
+      "api_params": ["amenity", "ferry_terminal"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to taxi stands",
+      "id": "taxi_stand",
+      "method": "distance",
+      "api_params": ["amenity", "taxi"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to post offices",
+      "id": "post_office",
+      "method": "distance",
+      "api_params": ["amenity", "post_office"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to telecommunication services",
+      "id": "telecommunication",
+      "method": "distance",
+      "api_params": ["amenity", "telecommunication"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to veterinary clinics",
+      "id": "veterinary",
+      "method": "distance",
+      "api_params": ["amenity", "veterinary"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to dentists",
+      "id": "dentist",
+      "method": "distance",
+      "api_params": ["amenity", "dentist"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to doctors",
+      "id": "doctors",
+      "method": "distance",
+      "api_params": ["amenity", "doctors"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to clinics",
+      "id": "clinic",
+      "method": "distance",
+      "api_params": ["amenity", "clinic"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to childcare facilities",
+      "id": "childcare",
+      "method": "distance",
+      "api_params": ["amenity", "childcare"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to kindergartens",
+      "id": "kindergarten",
+      "method": "distance",
+      "api_params": ["amenity", "kindergarten"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to universities",
+      "id": "university",
+      "method": "distance",
+      "api_params": ["amenity", "university"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to colleges",
+      "id": "college",
+      "method": "distance",
+      "api_params": ["amenity", "college"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to research institutions",
+      "id": "research",
+      "method": "distance",
+      "api_params": ["amenity", "research_institute"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to coworking spaces",
+      "id": "coworking",
+      "method": "distance",
+      "api_params": ["amenity", "coworking"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to business centers",
+      "id": "business_center",
+      "method": "distance",
+      "api_params": ["office", "company"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to office buildings",
+      "id": "office_density",
+      "method": "count",
+      "api_params": ["building", "office"],
+      "type": 1
+    },
+    {
+      "name": "Proximity to industrial areas",
+      "id": "industrial",
+      "method": "distance",
+      "api_params": ["landuse", "industrial"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to warehouses",
+      "id": "warehouse",
+      "method": "distance",
+      "api_params": ["building", "warehouse"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to retail areas",
+      "id": "retail",
+      "method": "distance",
+      "api_params": ["landuse", "retail"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to commercial areas",
+      "id": "commercial",
+      "method": "distance",
+      "api_params": ["landuse", "commercial"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to residential areas",
+      "id": "residential",
+      "method": "count",
+      "api_params": ["landuse", "residential"],
+      "type": 1
+    },
+    {
+      "name": "Proximity to cemeteries",
+      "id": "cemetery",
+      "method": "distance",
+      "api_params": ["landuse", "cemetery"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to religious sites",
+      "id": "religion",
+      "method": "distance",
+      "api_params": ["amenity", "place_of_worship"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to mosques",
+      "id": "mosque",
+      "method": "distance",
+      "api_params": ["amenity", "place_of_worship"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to churches",
+      "id": "church",
+      "method": "distance",
+      "api_params": ["amenity", "place_of_worship"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to synagogues",
+      "id": "synagogue",
+      "method": "distance",
+      "api_params": ["amenity", "place_of_worship"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to temples",
+      "id": "temple",
+      "method": "distance",
+      "api_params": ["amenity", "place_of_worship"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to community centers",
+      "id": "community_center",
+      "method": "distance",
+      "api_params": ["amenity", "community_centre"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to recycling points",
+      "id": "recycling",
+      "method": "distance",
+      "api_params": ["amenity", "recycling"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to waste disposal sites",
+      "id": "waste_disposal",
+      "method": "distance",
+      "api_params": ["amenity", "waste_disposal"],
+      "type": -1
+    },
+    {
+      "name": "Proximity to parks and gardens (density)",
+      "id": "leisure_density",
+      "method": "count",
+      "api_params": ["leisure", "park"],
+      "type": 1
+    },
+    {
+      "name": "Proximity to sports facilities (density)",
+      "id": "sport_density",
+      "method": "count",
+      "api_params": ["leisure", "sports_centre"],
+      "type": 1
+    },
+    {
+      "name": "Density of public transport stops",
+      "id": "public_transport_density",
+      "method": "count",
+      "api_params": ["public_transport", "stop_position"],
+      "type": 1
+    },
+    {
+      "name": "Density of high streets (commerce)",
+      "id": "high_street",
+      "method": "count",
+      "api_params": ["highway", "living_street"],
+      "type": 1
+    },
+    {
+      "name": "Density of footways (walkability)",
+      "id": "footway_density",
+      "method": "count",
+      "api_params": ["highway", "footway"],
+      "type": 1
+    },
+    {
+      "name": "Density of cycleways (bike accessibility)",
+      "id": "cycleway_density",
+      "method": "count",
+      "api_params": ["highway", "cycleway"],
+      "type": 1
+    },
+    {
+      "name": "Parking lot area coverage",
+      "id": "parking_cover",
+      "method": "area",
+      "api_params": ["amenity", "parking"],
+      "type": 1
+    },
+    {
+      "name": "Green spaces area coverage",
+      "id": "green_cover",
+      "method": "area",
+      "api_params": ["landuse", "grass"],
+      "type": 1
+    },
+    {
+      "name": "All shopping",
+      "id": "shopping",
+      "method": "count",
+      "api_params": ["shop", "*"],
+      "type": 1
+    }
+  ]
+}
+

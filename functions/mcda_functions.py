@@ -14,6 +14,60 @@ from pymcdm.weights.subjective.rancom import RANCOM
 np.set_printoptions(precision=4, suppress=True, linewidth=1000)
 
 
+import json
+import numpy as np
+import os
+
+def load_and_filter_criteria(criteria_path: str, selected_ids: list = None, merge: bool = False, merge_id: list = []) -> tuple:
+    """
+    Load and filter criteria from a JSON file, optionally merging specified criteria.
+
+    Args:
+        criteria_path (str): Path to JSON file with criteria.
+        selected_ids (list, optional): List of criterion IDs (strings) to include. Defaults to None (all criteria).
+        merge (bool, optional): Whether to merge criteria. Defaults to False.
+        merge_id (list, optional): List of criterion IDs (strings) to merge. Defaults to [].
+
+    Returns:
+        tuple: (filtered criteria list, criteria types array, indices of merged criteria)
+    """
+    # Load JSON
+    try:
+        with open(criteria_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        print(f"[ERROR] Failed to load {criteria_path}: {e}")
+        raise
+
+    # Validate JSON structure
+    all_criteria = data.get("criteria", [])
+    if not isinstance(all_criteria, list):
+        raise TypeError(f"Expected 'criteria' to be a list in {criteria_path}, got {type(all_criteria)}")
+
+    # Validate criteria
+    required_keys = {"id", "name", "type", "method", "api_params"}
+    for c in all_criteria:
+        if not isinstance(c, dict) or not required_keys.issubset(c) or not isinstance(c["id"], str):
+            raise ValueError(f"Invalid criterion in {criteria_path}: {c}")
+
+    # Filter criteria
+    filtered_criteria = [c for c in all_criteria if not selected_ids or str(c["id"]) in map(str, selected_ids)]
+
+    # Handle merging
+    poi_indices = []
+    if merge and merge_id:
+        valid_ids = [c["id"] for c in filtered_criteria]
+        poi_indices = [valid_ids.index(mid) for mid in map(str, merge_id) if mid in valid_ids]
+        if len(poi_indices) < len(merge_id):
+            print(f"[WARNING] Some merge IDs {merge_id} not found in {valid_ids}")
+
+    # Extract criteria types
+    criteria_types = np.array([c["type"] for c in filtered_criteria])
+
+    return filtered_criteria, criteria_types, poi_indices
+
+
+
 def make_rancom_weights(criteria_names: List[str], weights_file_path: str) -> None:
     """
     Makes weights for the RANCOM method.
@@ -159,7 +213,7 @@ def find_nearest_poi(lat: float, lon: float, tag_key: str, tag_value: str,
     return radius
 
 
-def save_cache(data: Dict, filename: str = 'cache.json') -> None:
+def save_cache(data: Dict, filename: str = 'cache/cache.json') -> None:
     """
     Saves data to a cache file in JSON format.
 
@@ -170,11 +224,12 @@ def save_cache(data: Dict, filename: str = 'cache.json') -> None:
     Returns:
         None
     """
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w') as f:
         json.dump(data, f, indent=2)
 
 
-def load_cache(filename: str = 'cache.json') -> Dict:
+def load_cache(filename: str = 'cache/cache.json') -> Dict:
     """
     Loads data from a cache file in JSON format.
 
@@ -186,7 +241,9 @@ def load_cache(filename: str = 'cache.json') -> Dict:
     """
     if os.path.exists(filename):
         with open(filename, 'r') as f:
+            print(f"[INFO] Loaded cache from {filename}")
             return json.load(f)
+    print(f"[INFO] Cache file {filename} does not exist, returning empty dict")
     return {}
 
 
@@ -485,30 +542,30 @@ def analyze_locations(points: List[Tuple[float, float]],
     radius = kwargs.get('radius', 500)
     delay = kwargs.get('delay', 1.0)
     chunk_delay = kwargs.get('chunk_delay', 5.0)
-    cache_file = kwargs.get('cache_file', f'{output_prefix}_cache.json')
+    cache_file = kwargs.get('cache_file', f'output/{output_prefix}_cache.json')
 
     # 1. Data processing
     alts = process_points_in_chunks(points, criteria, chunk_size, radius, delay, chunk_delay, cache_file)
-    print(f"[DEBUG] alts shape: {alts.shape}, sample: {alts[:2]}")  # Debug: wymiary i próbka alts
+    #print(f"[DEBUG] alts shape: {alts.shape}, sample: {alts[:2]}")  # Debug: wymiary i próbka alts
 
     # 2. Merging POI criteria (if provided)
     if poi_indices:
-        print(f"[DEBUG] Merging POI criteria with indices: {poi_indices}")
+        #print(f"[DEBUG] Merging POI criteria with indices: {poi_indices}")
         alts_final = merge_poi_criteria(alts, poi_indices, [c['name'] for c in criteria])
-        print(f"[DEBUG] After merging, alts_final shape: {alts_final.shape}, sample: {alts_final[:2]}")
+        #print(f"[DEBUG] After merging, alts_final shape: {alts_final.shape}, sample: {alts_final[:2]}")
     else:
-        print(f"[DEBUG] No POI merging (poi_indices is {poi_indices})")
+        #print(f"[DEBUG] No POI merging (poi_indices is {poi_indices})")
         alts_final = alts
-        print(f"[DEBUG] alts_final shape (no merging): {alts_final.shape}, sample: {alts_final[:2]}")
+        #print(f"[DEBUG] alts_final shape (no merging): {alts_final.shape}, sample: {alts_final[:2]}")
     # 3. Loading weights
     rancom = RANCOM(filename=weights_file)
     weights = rancom()
-    print(f"[DEBUG] Weights loaded from {weights_file}: {weights}, shape: {weights.shape}")
+    #print(f"[DEBUG] Weights loaded from {weights_file}: {weights}, shape: {weights.shape}")
 
     # 4. Validate dimensions
     expected_num_criteria = alts_final.shape[1]
-    print(f"[DEBUG] Expected number of criteria: {expected_num_criteria}")
-    print(f"[DEBUG] criteria_types: {criteria_types}, shape: {criteria_types.shape}")
+    #print(f"[DEBUG] Expected number of criteria: {expected_num_criteria}")
+    #print(f"[DEBUG] criteria_types: {criteria_types}, shape: {criteria_types.shape}")
     if len(criteria_types) != expected_num_criteria:
         raise ValueError(f"Dimension mismatch: criteria_types has {len(criteria_types)} elements, "
                          f"but alts_final has {expected_num_criteria} columns")
@@ -518,12 +575,12 @@ def analyze_locations(points: List[Tuple[float, float]],
 
     # 5. SPOTIS analysis
     bounds = calculate_bounds(alts_final)
-    print(f"[DEBUG] Bounds shape: {bounds.shape}, sample: {bounds}")
+    #print(f"[DEBUG] Bounds shape: {bounds.shape}, sample: {bounds}")
     spotis = SPOTIS(bounds)
     preferences = spotis(alts_final, weights, criteria_types)
     ranking = spotis.rank(preferences)
-    print(f"[DEBUG] Preferences shape: {preferences.shape}, sample: {preferences[:2]}")
-    print(f"[DEBUG] Ranking shape: {ranking.shape}, sample: {ranking[:2]}")
+    #print(f"[DEBUG] Preferences shape: {preferences.shape}, sample: {preferences[:2]}")
+    #print(f"[DEBUG] Ranking shape: {ranking.shape}, sample: {ranking[:2]}")
 
     # 6. Export results
     if export_results:
