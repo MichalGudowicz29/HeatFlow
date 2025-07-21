@@ -10,3 +10,28 @@ Note:
 Popraw swoje funkcje bo mozliwe ze jezeli cos mergowales to bylo to zle zrobione, zrob jeszcze raz rancom i jeszce raz recznie ustaw typy (Patrz rowery bo sa poprawione i teraz poprawnie sie lacza te punkty)
 =========================================================================================================
 
+- Dodalem do plot_heatmap parametr save_path, ktory zapisuje heatmape do path ktory chcemy, ale imo lepiej uzywac tej ktora ustawilem na default ktora robi tytul_data 
+- Dodalem printy do analyze location, wszystko co ma [debug] na przodzie
+- Pamietaj o mozliwosci dodania 
+
+weights_file_path = "data/ev_charing.csv"
+criteria_names = [
+    "Odleglosc do parkingu",
+    "Odleglosc do glownej drogi",
+    "Odleglosc od istniejacych juz stacji",
+    "Odleglosc od sklepow", 
+    "Odleglosc od restauracji",
+    "Gestosc zabudowy mieszkalnej"
+]
+
+print(f"Criterias: {len(criteria_names)}")
+for i, name in enumerate(criteria_names):
+    print(f"  {i}: {name}")
+
+if not os.path.exists(weights_file_path):
+    make_rancom_weights(criteria_names, weights_file_path)
+
+co pozwoli co automatycznie sprawdzic czy masz rancom a jak nie to go wywoluje, imo spoko
+
+=========================================================================================================
+
