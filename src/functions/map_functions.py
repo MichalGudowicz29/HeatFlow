@@ -90,7 +90,7 @@ def plot_heatmap(points, score, method='rbf', title="Heatmap",
     fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': proj_obj})
     
     # Add OSM basemap (always in PlateCarree)
-    osm = cimgt.OSM()
+    osm = cimgt.QuadtreeTiles()
     ax.add_image(osm, osm_zoom)
     ax.set_extent(extent, crs=ccrs.PlateCarree())
     ax.set_title(title)

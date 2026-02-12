@@ -65,7 +65,8 @@ def main():
         preferences,
         method="griddata",
         title=heatmap_title,
-        alpha=0.8,
+        projection="mercator",
+        alpha=0.65,
         grid_resolution=200,
     )
 

@@ -3,7 +3,8 @@ import json
 import os
 import time
 from typing import List, Tuple, Dict, Any
-
+import math
+from statistics import mean
 from geopy.distance import geodesic
 import requests
 from requests.exceptions import RequestException
@@ -14,9 +15,50 @@ from pymcdm.weights.subjective.rancom import RANCOM
 np.set_printoptions(precision=4, suppress=True, linewidth=1000)
 
 
-import json
-import numpy as np
-import os
+def get_routes_within_radius(lat, lon, tag_key, tag_val, radius, delay=1.0):
+    """
+    Zwraca liczbę unikalnych linii autobusowych w promieniu używając modelu duplikacji
+    tag_key i tag_val są ignorowane dla tej metody
+    """
+    try:
+        OVERPASS_URL = "http://overpass-api.de/api/interpreter"
+        
+        # Pobierz przystanki w promieniu
+        stops_query = f"""
+        [out:json][timeout:25];
+        (
+          node["highway"="bus_stop"](around:{radius},{lat},{lon});
+          node["public_transport"="platform"](around:{radius},{lat},{lon});
+        );
+        out ids;
+        """
+        
+        stops_response = requests.post(OVERPASS_URL, data={'data': stops_query})
+        stops_response.encoding = 'utf-8'
+        
+        if stops_response.status_code != 200:
+            return 1.0
+            
+        stops_data = stops_response.json()
+        stop_ids = [el['id'] for el in stops_data.get('elements', []) if el['type'] == 'node']
+        
+        if not stop_ids:
+            return 1.0
+        
+        # Model z efektem duplikacji
+        num_stops = len(stop_ids)
+        base_lines = int(math.sqrt(num_stops))
+        duplication_penalty = min(0.5, num_stops / 100)
+        unique_lines = max(1, int(base_lines * (1 - duplication_penalty)))
+        
+        time.sleep(delay)
+        return float(unique_lines)
+        
+    except Exception as e:
+        print(f"Error in get_routes_within_radius: {e}")
+        return 1.0
+
+
 
 def load_and_filter_criteria(criteria_path: str, selected_ids: list = None, merge: bool = False, merge_id: list = []) -> tuple:
     """
@@ -285,6 +327,8 @@ def get_criteria_vector(point: Tuple[float, float], criteria_list: List[Dict],
                 value = find_nearest_poi(lat, lon, tag_key, tag_val, radius, delay=delay)
             elif method == "count":
                 value = float(count(lat, lon, tag_key, tag_val, radius, delay=delay))
+            elif method == "unique_relations":
+                value = get_routes_within_radius(lat, lon, tag_key, tag_val, radius, delay=delay) 
             else:
                 value = 0.0
             values.append(value)
@@ -546,7 +590,7 @@ def analyze_locations(points: List[Tuple[float, float]],
 
     # 1. Data processing
     alts = process_points_in_chunks(points, criteria, chunk_size, radius, delay, chunk_delay, cache_file)
-    #print(f"[DEBUG] alts shape: {alts.shape}, sample: {alts[:2]}")  # Debug: wymiary i próbka alts
+    print(f"[DEBUG] alts shape: {alts.shape}, sample: {alts[:2]}")  # Debug: wymiary i próbka alts
 
     # 2. Merging POI criteria (if provided)
     if poi_indices:
@@ -554,9 +598,9 @@ def analyze_locations(points: List[Tuple[float, float]],
         alts_final = merge_poi_criteria(alts, poi_indices, [c['name'] for c in criteria])
         #print(f"[DEBUG] After merging, alts_final shape: {alts_final.shape}, sample: {alts_final[:2]}")
     else:
-        #print(f"[DEBUG] No POI merging (poi_indices is {poi_indices})")
+        print(f"[DEBUG] No POI merging (poi_indices is {poi_indices})")
         alts_final = alts
-        #print(f"[DEBUG] alts_final shape (no merging): {alts_final.shape}, sample: {alts_final[:2]}")
+        print(f"[DEBUG] alts_final shape (no merging): {alts_final.shape}, sample: {alts_final[:2]}")
     # 3. Loading weights
     rancom = RANCOM(filename=weights_file)
     weights = rancom()

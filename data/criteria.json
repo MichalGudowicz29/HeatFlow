@@ -22,11 +22,11 @@
       "type": 1
     },
     {
-      "name": "Proximity to grocery stores",
-      "id": "grocery",
-      "method": "distance",
-      "api_params": ["shop", "supermarket"],
-      "type": -1
+      "name": "Number of unique routes in radius",
+      "id": "unique_routes", 
+      "method": "unique_relations",
+      "api_params": ["highway", "bus_stop"],
+      "type": 1
     },
     {
       "name": "Proximity to restaurants",
@@ -121,21 +121,28 @@
     },
     {
       "name": "Proximity to bus stops",
-      "id": "bus_stop",
+      "id": "bus_stop_distance",
       "method": "distance",
       "api_params": ["highway", "bus_stop"],
       "type": -1
     },
+        {
+      "name": "Count of bus stops",
+      "id": "bus_stop_count",
+      "method": "count",
+      "api_params": ["highway", "bus_stop"],
+      "type": 1
+    },
     {
       "name": "Proximity to tram stops",
-      "id": "tram_stop",
+      "id": "tram_stop_distance",
       "method": "distance",
       "api_params": ["railway", "tram_stop"],
       "type": -1
     },
     {
       "name": "Proximity to train stations",
-      "id": "train_station",
+      "id": "train_station_distance",
       "method": "distance",
       "api_params": ["railway", "station"],
       "type": -1
@@ -706,6 +713,13 @@
       "method": "count",
       "api_params": ["highway", "footway"],
       "type": 1
+    },
+    {
+        "id": "cycleway_distance",
+        "name": "distance to cycleways",
+        "type": -1,
+        "method": "distance",
+        "api_params": ["highway", "cycleway"]
     },
     {
       "name": "Density of cycleways (bike accessibility)",
