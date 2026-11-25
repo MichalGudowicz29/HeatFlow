@@ -9,9 +9,10 @@
   const CRIT_COLORS = ["#2f6fb3", "#e08214", "#c2366b", "#2a9d9a", "#8a6d1f", "#4d4d4d", "#d4542b", "#5a8a2e",
     "#7fb0e0", "#b07a52", "#e2b42c", "#8c2f2f", "#5fbfa8", "#9a9a9a", "#1d3f6e"];
   const PALETTES = {
-    // domyślna: sekwencyjna, im ciemniej, tym lepiej; słabe obszary są półprzezroczyste, więc mapa pod nimi zostaje czytelna
-    intensity: { name: "Natężenie: jasne → ciemne", stops: ["#f7f0dc", "#f8d68e", "#f2a457", "#dd6431", "#b2321e", "#6e1611"], fade: true },
+    // domyślna: chłodne → ciepłe (im cieplej, tym lepiej)
     heat: { name: "Chłodne → ciepłe", stops: ["#2c7bb6", "#abd9e9", "#ffffbf", "#fdae61", "#d7191c"] },
+    // sekwencyjna, im ciemniej, tym lepiej; słabe obszary są półprzezroczyste
+    intensity: { name: "Natężenie: jasne → ciemne", stops: ["#f7f0dc", "#f8d68e", "#f2a457", "#dd6431", "#b2321e", "#6e1611"], fade: true },
     rdylgn: { name: "Czerwony → zielony", stops: ["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60", "#1a9850"] },
     viridis: { name: "Viridis", stops: ["#440154", "#3b528b", "#21918c", "#5ec962", "#fde725"] },
     magma: { name: "Magma", stops: ["#000004", "#51127c", "#b73779", "#fc8961", "#fcfdbf"] },
@@ -27,7 +28,7 @@
     weights: { mode: "manual", objective: "entropy", manual: {}, ranking: {}, scoring: {}, answers: {}, rancomInput: "pairs", rancomResult: null },
     area: null, areaLabel: "",
     spacing: "auto", maxDistance: 1500, method: "spotis", exclude: ["water"],
-    display: { palette: "intensity", reverse: false, opacity: 0.85, smooth: true, scale: "value" },
+    display: { palette: "heat", reverse: false, opacity: 0.85, smooth: true, scale: "value" },
     job: null, result: null, resultSig: null, resultCriteria: null, evaluation: null,
   };
   let uidSeq = 1;

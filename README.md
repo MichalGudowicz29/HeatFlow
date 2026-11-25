@@ -35,7 +35,7 @@ Wybierasz obszar i ustalasz, co jest ważne. HeatFlow ocenia miejsca na mapie i 
   <img src="assets/screenshots/zmiana-wagi.gif" alt="Po zwiększeniu wagi kryterium Parki miejsca bliżej parków na Pogodnie zyskują na mapie oceny." width="100%">
 </p>
 
-[Otwórz animację](assets/screenshots/zmiana-wagi.gif) · [Zobacz instrukcję krok po kroku](docs/instrukcja.md)
+[Zobacz instrukcję krok po kroku](docs/instrukcja.md)
 
 ## Przykłady
 
@@ -56,6 +56,8 @@ Każdy przykład to gotowy scenariusz z [`examples/`](examples/), który otwiera
 
 - **Odległość pieszo**, liczona po chodnikach i ścieżkach, albo w linii prostej.
 - **Wyjaśnienie wyniku**: po kliknięciu w mapę widać, które kryterium podniosło, a które obniżyło ocenę.
+- **Czytelna mapa**: nazwy ulic i osiedli są widoczne nad kolorami oceny, a paletę można zmienić jednym kliknięciem.
+- **Ranking pod ręką**: 10 najlepszych miejsc jest od razu pod legendą, a skalę można przełączyć między wynikiem metody a pozycją w rankingu.
 - **Pomijanie terenów** takich jak woda, lasy czy cmentarze.
 - **Eksport** do GeoJSON, CSV i PNG oraz zapis całej analizy do pliku, żeby wrócić do niej później.
 - **Działa lokalnie**: dane Szczecina z OpenStreetMap są na Twoim komputerze, analiza całego miasta trwa kilka–kilkanaście sekund.
@@ -95,4 +97,4 @@ uv run heatflow serve --port 5050   # otwórz http://127.0.0.1:5050
 
 Gotowe przykłady są w pierwszym kroku aplikacji (przyciski **Przykład: …**). Własne analizy zapisuje się i otwiera przyciskami **Zapisz** i **Wczytaj**.
 
-<sub>Kod na licencji [MIT](LICENSE). Dane mapy © współtwórcy OpenStreetMap, licencja ODbL.</sub>
+<sub>Kod na licencji [MIT](LICENSE). Dane mapy © współtwórcy OpenStreetMap, licencja ODbL. Podkład mapy: Esri Light Gray Canvas.</sub>
