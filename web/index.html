@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HeatFlow – mapy preferencji przestrzennych</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b2b2f'/%3E%3Crect x='6' y='6' width='9' height='9' fill='%232c7bb6'/%3E%3Crect x='17' y='6' width='9' height='9' fill='%23fdae61'/%3E%3Crect x='6' y='17' width='9' height='9' fill='%23ffffbf'/%3E%3Crect x='17' y='17' width='9' height='9' fill='%23d7191c'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="panel" id="panel" aria-label="Konfiguracja analizy">
+    <header class="brand">
+      <div class="wordmark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div>
+        <h1>HeatFlow</h1>
+        <p>Wielokryterialne mapy preferencji przestrzennych</p>
+      </div>
+      <div class="brand-actions">
+        <button class="ghost small" id="btnLoadScenario" type="button" title="Wczytaj scenariusz z pliku JSON">Wczytaj</button>
+        <button class="ghost small" id="btnSaveScenario" type="button" title="Zapisz scenariusz do pliku JSON">Zapisz</button>
+        <input type="file" id="scenarioFile" accept=".json,application/json" hidden>
+      </div>
+    </header>
+
+    <div class="steps">
+      <!-- 1 -->
+      <section class="step open" data-step="1">
+        <button class="step-head" type="button" aria-expanded="true">
+          <span class="num">1</span><span class="title">Problem decyzyjny</span><span class="summary" data-summary="1"></span>
+        </button>
+        <div class="step-body">
+          <label class="field"><span>Nazwa analizy</span>
+            <input id="name" type="text" placeholder="np. Lokalizacja stacji ładowania EV – Szczecin" maxlength="200"></label>
+          <label class="field"><span>Cel i kontekst</span>
+            <textarea id="goal" rows="3" placeholder="Co ma wskazać mapa i komu posłuży?"></textarea></label>
+          <div class="examples" id="examples"></div>
+        </div>
+      </section>
+
+      <!-- 2 -->
+      <section class="step" data-step="2">
+        <button class="step-head" type="button" aria-expanded="false">
+          <span class="num">2</span><span class="title">Kryteria i wagi</span><span class="summary" data-summary="2"></span>
+        </button>
+        <div class="step-body">
+          <div id="criteriaList" class="criteria"></div>
+          <div class="add-row">
+            <button class="secondary" id="btnAddCriterion" type="button">Dodaj kryterium</button>
+          </div>
+          <div class="picker" id="picker" hidden>
+            <div class="picker-tabs" role="tablist">
+              <button type="button" role="tab" class="active" data-tab="catalog">Katalog OSM</button>
+              <button type="button" role="tab" data-tab="custom">Własny tag OSM</button>
+              <button type="button" role="tab" data-tab="dataset">Własne dane</button>
+            </div>
+            <div class="picker-pane" data-pane="catalog">
+              <input type="search" id="catalogSearch" placeholder="Szukaj: parking, szkoła, park…" aria-label="Szukaj w katalogu">
+              <div class="catalog" id="catalogList"></div>
+            </div>
+            <div class="picker-pane" data-pane="custom" hidden>
+              <p class="hint">Dowolny obiekt OpenStreetMap. Tagi znajdziesz na <a href="https://wiki.openstreetmap.org/wiki/Map_features" target="_blank" rel="noopener">wiki.openstreetmap.org</a>.</p>
+              <div class="grid2">
+                <label class="field"><span>Klucz</span><input id="customKey" placeholder="amenity"></label>
+                <label class="field"><span>Wartości</span><input id="customValues" placeholder="cafe|restaurant (puste = dowolna)"></label>
+              </div>
+              <label class="field"><span>Nazwa kryterium</span><input id="customName" placeholder="Gastronomia"></label>
+              <button class="secondary" id="btnAddCustom" type="button">Dodaj</button>
+            </div>
+            <div class="picker-pane" data-pane="dataset" hidden>
+              <p class="hint">Plik GeoJSON (punkty, linie, poligony) albo CSV z kolumnami <b>lat</b> i <b>lon</b>, w układzie WGS84.</p>
+              <label class="upload">
+                <input type="file" id="datasetFile" accept=".geojson,.json,.csv,.txt,.tsv">
+                <span>Wybierz plik…</span>
+              </label>
+              <div id="datasetList" class="datasets"></div>
+            </div>
+          </div>
+
+          <div class="weights" id="weightsBox">
+            <h3>Wagi kryteriów</h3>
+            <div class="segmented" id="weightMode" role="radiogroup" aria-label="Sposób wyznaczania wag">
+              <button type="button" data-mode="manual" class="active">Ręczne</button>
+              <button type="button" data-mode="rancom">RANCOM</button>
+              <button type="button" data-mode="objective">Obiektywne</button>
+              <button type="button" data-mode="equal">Równe</button>
+            </div>
+            <p class="hint" id="weightHint"></p>
+            <div id="rancomBox" class="rancom" hidden>
+              <div class="segmented three" id="rancomInput" role="radiogroup" aria-label="Sposób określenia ważności w RANCOM">
+                <button type="button" data-input="pairs" class="active">Pytania parami</button>
+                <button type="button" data-input="ranking">Ranking</button>
+                <button type="button" data-input="scoring">Punktacja</button>
+              </div>
+              <button class="secondary" id="btnRancomStart" type="button">Rozpocznij porównania</button>
+              <div id="rancomInfo"></div>
+            </div>
+            <select id="objectiveMethod" hidden aria-label="Metoda wag obiektywnych">
+              <option value="entropy">Entropia</option>
+              <option value="critic">CRITIC</option>
+              <option value="std">Odchylenie standardowe</option>
+            </select>
+            <div id="weightsList" class="weights-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 -->
+      <section class="step" data-step="3">
+        <button class="step-head" type="button" aria-expanded="false">
+          <span class="num">3</span><span class="title">Obszar analizy</span><span class="summary" data-summary="3"></span>
+        </button>
+        <div class="step-body">
+          <p class="hint" id="areaHint">Znajdź miejscowość i użyj jej granicy albo narysuj obszar na mapie.</p>
+          <div class="tool-row">
+            <button class="secondary" id="btnCity" type="button" hidden>Całe miasto</button>
+            <button class="secondary" id="btnDrawRect" type="button">Prostokąt</button>
+            <button class="secondary" id="btnDrawPoly" type="button">Wielokąt</button>
+            <button class="ghost" id="btnClearArea" type="button">Wyczyść</button>
+          </div>
+          <div class="area-info" id="areaInfo">Nie wybrano obszaru.</div>
+          <p class="hint source" id="dataSource"></p>
+        </div>
+      </section>
+
+      <!-- 4 -->
+      <section class="step" data-step="4">
+        <button class="step-head" type="button" aria-expanded="false">
+          <span class="num">4</span><span class="title">Punkty analizy</span><span class="summary" data-summary="4"></span>
+        </button>
+        <div class="step-body">
+          <div class="grid2">
+            <label class="field"><span>Rozstaw siatki</span>
+              <select id="spacing">
+                <option value="auto">Automatyczny</option>
+                <option>50</option><option>100</option><option>150</option><option>200</option>
+                <option>250</option><option>300</option><option>500</option><option>750</option><option>1000</option>
+              </select></label>
+            <label class="field"><span>Maks. odległość wyszukiwania</span>
+              <select id="maxDistance">
+                <option value="750">750 m</option><option value="1000">1 km</option>
+                <option value="1500" selected>1,5 km</option><option value="2000">2 km</option>
+                <option value="3000">3 km</option><option value="5000">5 km</option>
+              </select></label>
+          </div>
+          <p class="hint" id="gridInfo">Wybierz obszar, aby zobaczyć liczbę punktów.</p>
+          <fieldset class="exclude">
+            <legend>Wyklucz z oceny</legend>
+            <div id="excludeList"></div>
+          </fieldset>
+        </div>
+      </section>
+
+      <!-- 5 -->
+      <section class="step" data-step="5">
+        <button class="step-head" type="button" aria-expanded="false">
+          <span class="num">5</span><span class="title">Analiza wielokryterialna</span><span class="summary" data-summary="5"></span>
+        </button>
+        <div class="step-body">
+          <label class="field"><span>Metoda MCDA</span><select id="method"></select></label>
+          <p class="hint" id="methodHint"></p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="run">
+      <div class="checklist" id="checklist"></div>
+      <button class="primary" id="btnRun" type="button">Generuj mapę preferencji</button>
+      <div class="progress" id="progress" hidden>
+        <div class="bar"><span id="progressBar"></span></div>
+        <p id="progressMsg"></p>
+      </div>
+      <div class="alert error" id="runError" hidden></div>
+    </footer>
+  </aside>
+
+  <main class="mapwrap">
+    <div id="map" aria-label="Mapa"></div>
+
+    <div class="search" role="search">
+      <input type="search" id="placeSearch" placeholder="Szukaj miejscowości lub adresu i naciśnij Enter" aria-label="Szukaj miejsca" autocomplete="off">
+      <ul id="placeResults" class="place-results" hidden></ul>
+    </div>
+
+    <section class="results" id="results" hidden aria-label="Mapa preferencji">
+      <header>
+        <div>
+          <h2 id="resTitle">Mapa preferencji</h2>
+          <p id="resMeta"></p>
+        </div>
+        <button class="ghost small" id="btnCollapse" type="button" aria-expanded="true" title="Zwiń">Zwiń</button>
+      </header>
+      <div class="results-body">
+        <div class="stale" id="evalNote" hidden></div>
+        <div class="stale" id="staleNote" hidden>Konfiguracja się zmieniła. Wygeneruj mapę ponownie, aby uwzględnić nowe kryteria, obszar lub siatkę.</div>
+        <figure class="legend needs-eval">
+          <canvas id="legendHist" width="320" height="56" aria-hidden="true"></canvas>
+          <div class="legend-bar" id="legendBar"></div>
+          <figcaption class="legend-labels"><span id="legendWorst"></span><span id="legendLabel"></span><span id="legendBest"></span></figcaption>
+          <p class="excluded-note" id="excludedNote" hidden></p>
+        </figure>
+
+        <div class="display">
+          <label class="field inline"><span>Paleta</span><select id="palette"></select></label>
+          <label class="check"><input type="checkbox" id="paletteReverse"> Odwróć</label>
+          <label class="field inline"><span>Skala</span><select id="scaleMode">
+            <option value="value">Wartość oceny</option>
+            <option value="rank">Pozycja w rankingu</option>
+          </select></label>
+          <label class="check" title="Interpolacja dwuliniowa między punktami siatki – tylko wizualna; ocena dotyczy punktów"><input type="checkbox" id="smooth" checked> Wygładzanie wizualne</label>
+          <label class="field inline grow"><span>Krycie</span><input type="range" id="opacity" min="0.2" max="1" step="0.05" value="0.72"></label>
+        </div>
+
+        <div class="needs-eval">
+          <h3>Wagi użyte w ocenie</h3>
+          <div class="usedweights" id="usedWeights"></div>
+          <div class="usedweights-legend" id="usedWeightsLegend"></div>
+        </div>
+        <div class="alerts" id="warnings"></div>
+
+        <div class="needs-eval">
+          <h3>Najlepsze lokalizacje</h3>
+          <ol class="top" id="topList"></ol>
+          <label class="check"><input type="checkbox" id="showTop" checked> Pokaż na mapie</label>
+        </div>
+
+        <h3>Obiekty źródłowe</h3>
+        <div class="layers" id="layerToggles"></div>
+
+        <div class="exports">
+          <a class="secondary" id="expGeojson" href="#" download>GeoJSON</a>
+          <a class="secondary" id="expCsv" href="#" download>CSV</a>
+          <button class="secondary" id="expPng" type="button">PNG warstwy</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<dialog id="rancomDialog" class="wizard" aria-labelledby="wizTitle">
+  <header>
+    <div>
+      <h2 id="wizTitle">RANCOM: porównanie kryteriów</h2>
+      <p id="wizProgress"></p>
+    </div>
+    <button type="button" class="ghost small" id="wizClose">Zamknij</button>
+  </header>
+  <div class="wiz-bar"><span id="wizBar"></span></div>
+  <p class="wiz-q">Które kryterium jest ważniejsze w tej analizie?</p>
+  <div class="wiz-options" id="wizOptions"></div>
+  <footer>
+    <button type="button" class="secondary small" id="wizBack">Poprzednie pytanie</button>
+    <span class="hint">Klawisze: ← pierwsze, ↓ równie ważne, → drugie</span>
+  </footer>
+</dialog>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

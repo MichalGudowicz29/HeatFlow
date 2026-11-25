@@ -1,0 +1,104 @@
+{
+  "heatflow_scenario": 1,
+  "name": "Lokalizacja nowych stacji ładowania EV – Szczecin",
+  "goal": "Wskazanie obszarów centrum Szczecina najbardziej preferowanych dla nowych stacji ładowania pojazdów elektrycznych (przykład 2 z prezentacji HeatFlow).",
+  "area": {
+    "bbox": [
+      14.508,
+      53.401,
+      14.587,
+      53.445
+    ]
+  },
+  "grid": {
+    "spacing": 250
+  },
+  "max_distance": 1500,
+  "exclude": [
+    "water"
+  ],
+  "criteria": [
+    {
+      "id": "parking",
+      "name": "Gęstość parkingów",
+      "source": {
+        "type": "osm",
+        "key": "amenity",
+        "values": [
+          "parking"
+        ]
+      },
+      "method": "count",
+      "radius": 500,
+      "direction": "benefit"
+    },
+    {
+      "id": "main_roads",
+      "name": "Odległość do głównych dróg",
+      "source": {
+        "type": "osm",
+        "key": "highway",
+        "values": [
+          "trunk",
+          "primary",
+          "secondary"
+        ]
+      },
+      "method": "distance",
+      "metric": "walking",
+      "direction": "cost"
+    },
+    {
+      "id": "existing_stations",
+      "name": "Odległość od istniejących stacji",
+      "source": {
+        "type": "osm",
+        "key": "amenity",
+        "values": [
+          "charging_station"
+        ]
+      },
+      "method": "distance",
+      "metric": "euclidean",
+      "direction": "benefit"
+    },
+    {
+      "id": "shops",
+      "name": "Gęstość sklepów",
+      "source": {
+        "type": "osm",
+        "key": "shop",
+        "values": null
+      },
+      "method": "count",
+      "radius": 500,
+      "direction": "benefit"
+    },
+    {
+      "id": "residential",
+      "name": "Gęstość zabudowy mieszkalnej",
+      "source": {
+        "type": "osm",
+        "key": "building",
+        "values": [
+          "apartments",
+          "residential"
+        ]
+      },
+      "method": "count",
+      "radius": 500,
+      "direction": "benefit"
+    }
+  ],
+  "method": "spotis",
+  "weights": {
+    "mode": "manual",
+    "values": [
+      0.2,
+      0.25,
+      0.35,
+      0.15,
+      0.05
+    ]
+  }
+}

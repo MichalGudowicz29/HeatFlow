@@ -1,0 +1,1274 @@
+{
+ "version": 2,
+ "categories": [
+  {
+   "id": "transport",
+   "name": "Transport i mobilność"
+  },
+  {
+   "id": "uslugi",
+   "name": "Usługi i handel"
+  },
+  {
+   "id": "zdrowie",
+   "name": "Zdrowie i bezpieczeństwo"
+  },
+  {
+   "id": "edukacja",
+   "name": "Edukacja"
+  },
+  {
+   "id": "rekreacja",
+   "name": "Rekreacja i zieleń"
+  },
+  {
+   "id": "kultura",
+   "name": "Kultura i turystyka"
+  },
+  {
+   "id": "zabudowa",
+   "name": "Zabudowa i użytkowanie terenu"
+  },
+  {
+   "id": "motoryzacja",
+   "name": "Motoryzacja"
+  },
+  {
+   "id": "infrastruktura",
+   "name": "Infrastruktura miejska"
+  }
+ ],
+ "layers": [
+  {
+   "id": "main_roads",
+   "name": "Główne drogi",
+   "category": "transport",
+   "osm": {
+    "key": "highway",
+    "values": [
+     "trunk",
+     "primary",
+     "secondary"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": "Drogi krajowe, wojewódzkie i główne arterie miejskie (highway=trunk|primary|secondary)."
+  },
+  {
+   "id": "secondary_roads",
+   "name": "Drogi lokalne zbiorcze",
+   "category": "transport",
+   "osm": {
+    "key": "highway",
+    "values": [
+     "tertiary"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "bus_stops",
+   "name": "Przystanki autobusowe",
+   "category": "transport",
+   "osm": {
+    "key": "highway",
+    "values": [
+     "bus_stop"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "tram_stops",
+   "name": "Przystanki tramwajowe",
+   "category": "transport",
+   "osm": {
+    "key": "railway",
+    "values": [
+     "tram_stop"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "pt_platforms",
+   "name": "Perony i przystanki transportu publicznego",
+   "category": "transport",
+   "osm": {
+    "key": "public_transport",
+    "values": [
+     "platform"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": ""
+  },
+  {
+   "id": "railway_stations",
+   "name": "Stacje kolejowe",
+   "category": "transport",
+   "osm": {
+    "key": "railway",
+    "values": [
+     "station",
+     "halt"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "cycleways",
+   "name": "Drogi rowerowe",
+   "category": "transport",
+   "osm": {
+    "key": "highway",
+    "values": [
+     "cycleway"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "footways",
+   "name": "Chodniki i ciągi piesze",
+   "category": "transport",
+   "osm": {
+    "key": "highway",
+    "values": [
+     "footway",
+     "pedestrian"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": "Gęstość infrastruktury pieszej (liczba odcinków w promieniu)."
+  },
+  {
+   "id": "bicycle_parking",
+   "name": "Parkingi rowerowe",
+   "category": "transport",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "bicycle_parking"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "bicycle_rental",
+   "name": "Wypożyczalnie rowerów",
+   "category": "transport",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "bicycle_rental"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "taxi",
+   "name": "Postoje taksówek",
+   "category": "transport",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "taxi"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "ferry_terminal",
+   "name": "Przystanie promowe",
+   "category": "transport",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "ferry_terminal"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "airport",
+   "name": "Lotniska",
+   "category": "transport",
+   "osm": {
+    "key": "aeroway",
+    "values": [
+     "aerodrome"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "parking",
+   "name": "Parkingi",
+   "category": "motoryzacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "parking"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": ""
+  },
+  {
+   "id": "charging_stations",
+   "name": "Stacje ładowania EV",
+   "category": "motoryzacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "charging_station"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "benefit"
+   },
+   "description": "Domyślnie korzyść: dalej od istniejących stacji = lepiej (luka w sieci)."
+  },
+  {
+   "id": "fuel",
+   "name": "Stacje paliw",
+   "category": "motoryzacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "fuel"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "car_repair",
+   "name": "Warsztaty samochodowe",
+   "category": "motoryzacja",
+   "osm": {
+    "key": "shop",
+    "values": [
+     "car_repair"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "car_wash",
+   "name": "Myjnie",
+   "category": "motoryzacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "car_wash"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "car_rental",
+   "name": "Wypożyczalnie samochodów",
+   "category": "motoryzacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "car_rental"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "shops",
+   "name": "Sklepy (wszystkie)",
+   "category": "uslugi",
+   "osm": {
+    "key": "shop",
+    "values": null
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": "Dowolny obiekt z tagiem shop."
+  },
+  {
+   "id": "supermarkets",
+   "name": "Supermarkety",
+   "category": "uslugi",
+   "osm": {
+    "key": "shop",
+    "values": [
+     "supermarket"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "convenience",
+   "name": "Sklepy osiedlowe",
+   "category": "uslugi",
+   "osm": {
+    "key": "shop",
+    "values": [
+     "convenience"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "malls",
+   "name": "Centra handlowe",
+   "category": "uslugi",
+   "osm": {
+    "key": "shop",
+    "values": [
+     "mall",
+     "department_store"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "bakery",
+   "name": "Piekarnie",
+   "category": "uslugi",
+   "osm": {
+    "key": "shop",
+    "values": [
+     "bakery"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "restaurants",
+   "name": "Restauracje",
+   "category": "uslugi",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "restaurant"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "cafes",
+   "name": "Kawiarnie",
+   "category": "uslugi",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "cafe"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "fast_food",
+   "name": "Fast food",
+   "category": "uslugi",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "fast_food"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "banks",
+   "name": "Banki",
+   "category": "uslugi",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "bank"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "atm",
+   "name": "Bankomaty",
+   "category": "uslugi",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "atm"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "post_office",
+   "name": "Placówki pocztowe",
+   "category": "uslugi",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "post_office"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "parcel_lockers",
+   "name": "Paczkomaty",
+   "category": "uslugi",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "parcel_locker"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "hotels",
+   "name": "Hotele",
+   "category": "uslugi",
+   "osm": {
+    "key": "tourism",
+    "values": [
+     "hotel"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "offices",
+   "name": "Biura",
+   "category": "uslugi",
+   "osm": {
+    "key": "office",
+    "values": null
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": "Dowolny obiekt z tagiem office."
+  },
+  {
+   "id": "pharmacy",
+   "name": "Apteki",
+   "category": "zdrowie",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "pharmacy"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "hospitals",
+   "name": "Szpitale",
+   "category": "zdrowie",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "hospital"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "clinics",
+   "name": "Przychodnie i gabinety",
+   "category": "zdrowie",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "clinic",
+     "doctors"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "dentist",
+   "name": "Dentyści",
+   "category": "zdrowie",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "dentist"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "veterinary",
+   "name": "Weterynarze",
+   "category": "zdrowie",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "veterinary"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "police",
+   "name": "Policja",
+   "category": "zdrowie",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "police"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "fire_station",
+   "name": "Straż pożarna",
+   "category": "zdrowie",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "fire_station"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "defibrillators",
+   "name": "Defibrylatory AED",
+   "category": "zdrowie",
+   "osm": {
+    "key": "emergency",
+    "values": [
+     "defibrillator"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "kindergartens",
+   "name": "Przedszkola i żłobki",
+   "category": "edukacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "kindergarten",
+     "childcare"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "schools",
+   "name": "Szkoły",
+   "category": "edukacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "school"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "universities",
+   "name": "Uczelnie",
+   "category": "edukacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "university",
+     "college"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "libraries",
+   "name": "Biblioteki",
+   "category": "edukacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "library"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "parks",
+   "name": "Parki",
+   "category": "rekreacja",
+   "osm": {
+    "key": "leisure",
+    "values": [
+     "park"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "playgrounds",
+   "name": "Place zabaw",
+   "category": "rekreacja",
+   "osm": {
+    "key": "leisure",
+    "values": [
+     "playground"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "sports_centres",
+   "name": "Obiekty sportowe",
+   "category": "rekreacja",
+   "osm": {
+    "key": "leisure",
+    "values": [
+     "sports_centre",
+     "pitch",
+     "stadium"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "fitness",
+   "name": "Siłownie i fitness",
+   "category": "rekreacja",
+   "osm": {
+    "key": "leisure",
+    "values": [
+     "fitness_centre",
+     "fitness_station"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "swimming_pools",
+   "name": "Baseny",
+   "category": "rekreacja",
+   "osm": {
+    "key": "leisure",
+    "values": [
+     "swimming_pool",
+     "water_park"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "forests",
+   "name": "Lasy",
+   "category": "rekreacja",
+   "osm": {
+    "key": "landuse",
+    "values": [
+     "forest"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": "Obszary leśne (landuse=forest)."
+  },
+  {
+   "id": "woods",
+   "name": "Zadrzewienia naturalne",
+   "category": "rekreacja",
+   "osm": {
+    "key": "natural",
+    "values": [
+     "wood"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "water",
+   "name": "Wody powierzchniowe",
+   "category": "rekreacja",
+   "osm": {
+    "key": "natural",
+    "values": [
+     "water"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "beaches",
+   "name": "Plaże",
+   "category": "rekreacja",
+   "osm": {
+    "key": "natural",
+    "values": [
+     "beach"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "nature_reserves",
+   "name": "Rezerwaty przyrody",
+   "category": "rekreacja",
+   "osm": {
+    "key": "leisure",
+    "values": [
+     "nature_reserve"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "drinking_water",
+   "name": "Poidełka / woda pitna",
+   "category": "rekreacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "drinking_water"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "benches",
+   "name": "Ławki",
+   "category": "rekreacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "bench"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": ""
+  },
+  {
+   "id": "toilets",
+   "name": "Toalety publiczne",
+   "category": "rekreacja",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "toilets"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "cinemas",
+   "name": "Kina",
+   "category": "kultura",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "cinema"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "theatres",
+   "name": "Teatry",
+   "category": "kultura",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "theatre"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "museums",
+   "name": "Muzea",
+   "category": "kultura",
+   "osm": {
+    "key": "tourism",
+    "values": [
+     "museum"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "attractions",
+   "name": "Atrakcje turystyczne",
+   "category": "kultura",
+   "osm": {
+    "key": "tourism",
+    "values": [
+     "attraction",
+     "viewpoint"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "community_centres",
+   "name": "Domy kultury i centra społeczne",
+   "category": "kultura",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "community_centre"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "places_of_worship",
+   "name": "Miejsca kultu",
+   "category": "kultura",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "place_of_worship"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "residential_buildings",
+   "name": "Budynki mieszkalne",
+   "category": "zabudowa",
+   "osm": {
+    "key": "building",
+    "values": [
+     "residential",
+     "apartments",
+     "house",
+     "detached",
+     "semidetached_house",
+     "terrace"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": "Liczba budynków mieszkalnych w promieniu (przybliżenie gęstości zaludnienia)."
+  },
+  {
+   "id": "apartment_blocks",
+   "name": "Bloki mieszkalne",
+   "category": "zabudowa",
+   "osm": {
+    "key": "building",
+    "values": [
+     "apartments"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": ""
+  },
+  {
+   "id": "residential_areas",
+   "name": "Tereny mieszkaniowe",
+   "category": "zabudowa",
+   "osm": {
+    "key": "landuse",
+    "values": [
+     "residential"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "commercial_areas",
+   "name": "Tereny usługowe i handlowe",
+   "category": "zabudowa",
+   "osm": {
+    "key": "landuse",
+    "values": [
+     "commercial",
+     "retail"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "industrial_areas",
+   "name": "Tereny przemysłowe",
+   "category": "zabudowa",
+   "osm": {
+    "key": "landuse",
+    "values": [
+     "industrial"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "benefit"
+   },
+   "description": "Domyślnie korzyść: dalej od przemysłu = lepiej."
+  },
+  {
+   "id": "warehouses",
+   "name": "Magazyny",
+   "category": "zabudowa",
+   "osm": {
+    "key": "building",
+    "values": [
+     "warehouse"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "cemeteries",
+   "name": "Cmentarze",
+   "category": "zabudowa",
+   "osm": {
+    "key": "landuse",
+    "values": [
+     "cemetery"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "benefit"
+   },
+   "description": ""
+  },
+  {
+   "id": "recycling",
+   "name": "Punkty recyklingu",
+   "category": "infrastruktura",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "recycling"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  },
+  {
+   "id": "waste_baskets",
+   "name": "Kosze na śmieci",
+   "category": "infrastruktura",
+   "osm": {
+    "key": "amenity",
+    "values": [
+     "waste_basket"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": ""
+  },
+  {
+   "id": "street_lamps",
+   "name": "Latarnie uliczne",
+   "category": "infrastruktura",
+   "osm": {
+    "key": "highway",
+    "values": [
+     "street_lamp"
+    ]
+   },
+   "default": {
+    "method": "count",
+    "direction": "benefit"
+   },
+   "description": ""
+  },
+  {
+   "id": "power_lines",
+   "name": "Linie wysokiego napięcia",
+   "category": "infrastruktura",
+   "osm": {
+    "key": "power",
+    "values": [
+     "line"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "benefit"
+   },
+   "description": "Domyślnie korzyść: dalej od linii = lepiej."
+  },
+  {
+   "id": "substations",
+   "name": "Stacje transformatorowe",
+   "category": "infrastruktura",
+   "osm": {
+    "key": "power",
+    "values": [
+     "substation"
+    ]
+   },
+   "default": {
+    "method": "distance",
+    "direction": "cost"
+   },
+   "description": ""
+  }
+ ]
+}
