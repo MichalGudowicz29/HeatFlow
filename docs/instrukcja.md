@@ -36,11 +36,11 @@ Otwórz **Analiza wielokryterialna**. Na początek zostaw metodę **SPOTIS** i k
 
 ## 6. Sprawdź wynik i zapisz go
 
-Odczytaj kolory z legendy po prawej. Słupki nad skalą pokazują, ile punktów uzyskało podobny wynik. Kliknij kolorowy fragment mapy, aby sprawdzić wartości dla najbliższego punktu siatki. W kolumnie **Strata** pełny pasek oznacza najgorszą wartość danego kryterium w ocenianym obszarze.
+Odczytaj kolory z legendy po prawej: im cieplej, tym lepiej. Słupki nad skalą pokazują, ile punktów uzyskało podobny wynik. Przełącznikiem **Wartość / Ranking** zmienisz skalę z wyniku metody na pozycję w rankingu. Kliknij kolorowy fragment mapy, aby sprawdzić wartości dla najbliższego punktu siatki. W kolumnie **Strata** pełny pasek oznacza najgorszą wartość danego kryterium w ocenianym obszarze.
 
 ![Wynik jednego punktu, wartości kryteriów i paski strat](../assets/screenshots/06-szczegoly-punktu.png)
 
-Przewiń panel wyników do **Najlepsze lokalizacje**. Kliknij wiersz, aby przybliżyć miejsce. Niżej wybierz **CSV**, aby pobrać tabelę, **GeoJSON**, aby otworzyć punkty w programie mapowym, lub **PNG warstwy**, aby zapisać samą kolorową warstwę. Przycisk **Zapisz** u góry po lewej pobiera ustawienia analizy. Możesz je później otworzyć przez **Wczytaj**.
+Zaraz pod legendą jest lista **Najlepsze lokalizacje**. Kliknij wiersz, aby przybliżyć miejsce i otworzyć jego szczegóły. W pasku **Pobierz** na dole panelu wybierz **CSV**, aby pobrać tabelę, **GeoJSON**, aby otworzyć punkty w programie mapowym, lub **PNG warstwy**, aby zapisać samą kolorową warstwę. Przycisk **Zapisz** u góry po lewej pobiera ustawienia analizy. Możesz je później otworzyć przez **Wczytaj**.
 
 ![Opcje pobierania wyników i przycisk zapisu scenariusza](../assets/screenshots/08-eksport.png)
 
@@ -48,8 +48,8 @@ Przewiń panel wyników do **Najlepsze lokalizacje**. Kliknij wiersz, aby przybl
 
 **Dlaczego część mapy jest szara?** Szare wypełnienie wewnątrz obszaru oznacza tereny wyłączone z oceny, np. wodę. Przy legendzie znajdziesz liczbę pominiętych punktów.
 
-**Czy czerwony zawsze oznacza dobre miejsce?** Znaczenie koloru zależy od palety. Szukaj koloru podpisanego „lepiej” po prawej stronie legendy. Możesz zmienić paletę lub odwrócić kolory.
+**Czy czerwony zawsze oznacza dobre miejsce?** W domyślnej palecie tak. Po zmianie palety szukaj koloru podpisanego „lepiej” po prawej stronie legendy. Paletę i odwrócenie kolorów zmienisz w sekcji **Wyświetlanie** w panelu wyników.
 
 **Jak sprawdzić inne wagi?** Wróć do kroku 2 i zmień wagi. Mapa przeliczy oceny na podstawie już pobranych danych. Po zmianie obszaru, zestawu kryteriów lub rozstawu siatki ponownie kliknij **Generuj mapę preferencji**.
 
-**Co oznacza „≥ 1500 m” przy odległości?** To limit zastosowany w przykładzie. Odległości od tej granicy wzwyż są traktowane jednakowo. Przy dojściu pieszym taką wartość może też dostać punkt bez trasy w zasięgu limitu. Sprawdź ostrzeżenia w panelu wyników.
+**Co oznacza „≥ 1500 m” przy odległości?** To limit zastosowany w przykładzie. Odległości od tej granicy wzwyż są traktowane jednakowo. Przy dojściu pieszym taką wartość może też dostać punkt bez trasy w zasięgu limitu. Sprawdź sekcję **Uwagi do danych** w panelu wyników.
