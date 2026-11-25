@@ -1,29 +1,41 @@
 <!doctype html>
-<html lang="pl">
+<html lang="pl" data-type="software" data-radius="soft" data-buttons="tonal" data-motion>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HeatFlow – mapy preferencji przestrzennych</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HeatFlow: mapy preferencji lokalizacji w Szczecinie</title>
+  <meta name="description" content="Wielokryterialna analiza lokalizacji (SPOTIS, TOPSIS, VIKOR) na danych OpenStreetMap: wybierz kryteria, obszar i wagi, a mapa pokaże najlepsze miejsca.">
+  <meta name="theme-color" content="#f8f8f8">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b2b2f'/%3E%3Crect x='6' y='6' width='9' height='9' fill='%232c7bb6'/%3E%3Crect x='17' y='6' width='9' height='9' fill='%23fdae61'/%3E%3Crect x='6' y='17' width='9' height='9' fill='%23ffffbf'/%3E%3Crect x='17' y='17' width='9' height='9' fill='%23d7191c'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+  <link rel="stylesheet" href="assets/motion/motion.css">
   <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
 </head>
 <body>
+<a class="skip-link" href="#top">Przejdź do mapy</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-open" viewBox="0 0 16 16"><path d="M2.5 4.5h4l1.2 1.5h5.8v6.5h-11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-save" viewBox="0 0 16 16"><path d="M8 2.5v7.5M4.8 7l3.2 3.2L11.2 7M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v4M8 4.9v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.4 10.4l3.2 3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 16 16"><path d="M8 2.2l6.2 11H1.8z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 6.5v3.2M8 11.4v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+</svg>
 <div class="app">
   <aside class="panel" id="panel" aria-label="Konfiguracja analizy">
-    <header class="brand">
+    <header class="brand hero" data-enter>
       <div class="wordmark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-      <div>
-        <h1>HeatFlow</h1>
-        <p>Wielokryterialne mapy preferencji przestrzennych</p>
+      <div class="brand-text">
+        <h1><span class="name">HeatFlow</span> <span class="sub">wielokryterialne mapy preferencji przestrzennych</span></h1>
       </div>
       <div class="brand-actions">
-        <button class="ghost small" id="btnLoadScenario" type="button" title="Wczytaj scenariusz z pliku JSON">Wczytaj</button>
-        <button class="ghost small" id="btnSaveScenario" type="button" title="Zapisz scenariusz do pliku JSON">Zapisz</button>
+        <button class="btn btn--secondary btn--sm" id="btnLoadScenario" type="button" title="Wczytaj scenariusz z pliku JSON"><svg class="ic" aria-hidden="true"><use href="#i-open"/></svg>Wczytaj</button>
+        <button class="btn btn--secondary btn--sm" id="btnSaveScenario" type="button" title="Zapisz scenariusz do pliku JSON"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg>Zapisz</button>
         <input type="file" id="scenarioFile" accept=".json,application/json" hidden>
       </div>
     </header>
@@ -31,48 +43,53 @@
     <div class="steps">
       <!-- 1 -->
       <section class="step open" data-step="1">
-        <button class="step-head" type="button" aria-expanded="true">
-          <span class="num">1</span><span class="title">Problem decyzyjny</span><span class="summary" data-summary="1"></span>
-        </button>
+        <h2 class="step-h"><button class="step-head" type="button" aria-expanded="true">
+          <span class="num">1</span><span class="step-label"><span class="title">Problem decyzyjny</span><span class="summary" data-summary="1"></span></span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>
+        </button></h2>
         <div class="step-body">
           <label class="field"><span>Nazwa analizy</span>
             <input id="name" type="text" placeholder="np. Lokalizacja stacji ładowania EV – Szczecin" maxlength="200"></label>
           <label class="field"><span>Cel i kontekst</span>
             <textarea id="goal" rows="3" placeholder="Co ma wskazać mapa i komu posłuży?"></textarea></label>
-          <div class="examples" id="examples"></div>
+          <div class="examples-box">
+            <p class="label">Gotowe przykłady</p>
+            <div class="examples" id="examples"></div>
+          </div>
         </div>
       </section>
 
       <!-- 2 -->
       <section class="step" data-step="2">
-        <button class="step-head" type="button" aria-expanded="false">
-          <span class="num">2</span><span class="title">Kryteria i wagi</span><span class="summary" data-summary="2"></span>
-        </button>
+        <h2 class="step-h"><button class="step-head" type="button" aria-expanded="false">
+          <span class="num">2</span><span class="step-label"><span class="title">Kryteria i wagi</span><span class="summary" data-summary="2"></span></span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>
+        </button></h2>
         <div class="step-body">
           <div id="criteriaList" class="criteria"></div>
           <div class="add-row">
-            <button class="secondary" id="btnAddCriterion" type="button">Dodaj kryterium</button>
+            <button class="btn btn--secondary btn--sm" id="btnAddCriterion" type="button">Dodaj kryterium</button>
           </div>
           <div class="picker" id="picker" hidden>
-            <div class="picker-tabs" role="tablist">
-              <button type="button" role="tab" class="active" data-tab="catalog">Katalog OSM</button>
-              <button type="button" role="tab" data-tab="custom">Własny tag OSM</button>
-              <button type="button" role="tab" data-tab="dataset">Własne dane</button>
+            <div class="picker-tabs" role="tablist" aria-label="Źródło kryterium">
+              <button type="button" role="tab" class="active" aria-selected="true" data-tab="catalog">Katalog OSM</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="custom">Własny tag</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="dataset">Własne dane</button>
             </div>
-            <div class="picker-pane" data-pane="catalog">
-              <input type="search" id="catalogSearch" placeholder="Szukaj: parking, szkoła, park…" aria-label="Szukaj w katalogu">
+            <div class="picker-pane" data-pane="catalog" role="tabpanel">
+              <label class="search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+                <input type="search" id="catalogSearch" placeholder="parking, szkoła, park…" aria-label="Szukaj w katalogu OSM"></label>
               <div class="catalog" id="catalogList"></div>
             </div>
-            <div class="picker-pane" data-pane="custom" hidden>
-              <p class="hint">Dowolny obiekt OpenStreetMap. Tagi znajdziesz na <a href="https://wiki.openstreetmap.org/wiki/Map_features" target="_blank" rel="noopener">wiki.openstreetmap.org</a>.</p>
+            <div class="picker-pane" data-pane="custom" role="tabpanel" hidden>
+              <p class="hint">Dowolny obiekt OpenStreetMap. Tagi znajdziesz na <a class="link" href="https://wiki.openstreetmap.org/wiki/Map_features" target="_blank" rel="noopener">wiki.openstreetmap.org</a>.</p>
               <div class="grid2">
                 <label class="field"><span>Klucz</span><input id="customKey" placeholder="amenity"></label>
-                <label class="field"><span>Wartości</span><input id="customValues" placeholder="cafe|restaurant (puste = dowolna)"></label>
+                <label class="field"><span>Wartości</span><input id="customValues" placeholder="cafe|restaurant"></label>
               </div>
+              <p class="hint">Puste pole wartości oznacza dowolną wartość klucza.</p>
               <label class="field"><span>Nazwa kryterium</span><input id="customName" placeholder="Gastronomia"></label>
-              <button class="secondary" id="btnAddCustom" type="button">Dodaj</button>
+              <button class="btn btn--secondary btn--sm" id="btnAddCustom" type="button">Dodaj kryterium</button>
             </div>
-            <div class="picker-pane" data-pane="dataset" hidden>
+            <div class="picker-pane" data-pane="dataset" role="tabpanel" hidden>
               <p class="hint">Plik GeoJSON (punkty, linie, poligony) albo CSV z kolumnami <b>lat</b> i <b>lon</b>, w układzie WGS84.</p>
               <label class="upload">
                 <input type="file" id="datasetFile" accept=".geojson,.json,.csv,.txt,.tsv">
@@ -84,27 +101,28 @@
 
           <div class="weights" id="weightsBox">
             <h3>Wagi kryteriów</h3>
-            <div class="segmented" id="weightMode" role="radiogroup" aria-label="Sposób wyznaczania wag">
-              <button type="button" data-mode="manual" class="active">Ręczne</button>
-              <button type="button" data-mode="rancom">RANCOM</button>
-              <button type="button" data-mode="objective">Obiektywne</button>
-              <button type="button" data-mode="equal">Równe</button>
+            <div class="segmented four" id="weightMode" role="radiogroup" aria-label="Sposób wyznaczania wag">
+              <button type="button" role="radio" data-mode="manual" class="active">Ręczne</button>
+              <button type="button" role="radio" data-mode="rancom">RANCOM</button>
+              <button type="button" role="radio" data-mode="objective">Obiektywne</button>
+              <button type="button" role="radio" data-mode="equal">Równe</button>
             </div>
             <p class="hint" id="weightHint"></p>
             <div id="rancomBox" class="rancom" hidden>
               <div class="segmented three" id="rancomInput" role="radiogroup" aria-label="Sposób określenia ważności w RANCOM">
-                <button type="button" data-input="pairs" class="active">Pytania parami</button>
-                <button type="button" data-input="ranking">Ranking</button>
-                <button type="button" data-input="scoring">Punktacja</button>
+                <button type="button" role="radio" data-input="pairs" class="active">Pytania parami</button>
+                <button type="button" role="radio" data-input="ranking">Ranking</button>
+                <button type="button" role="radio" data-input="scoring">Punktacja</button>
               </div>
-              <button class="secondary" id="btnRancomStart" type="button">Rozpocznij porównania</button>
+              <button class="btn btn--secondary btn--sm" id="btnRancomStart" type="button">Rozpocznij porównania</button>
               <div id="rancomInfo"></div>
             </div>
-            <select id="objectiveMethod" hidden aria-label="Metoda wag obiektywnych">
-              <option value="entropy">Entropia</option>
-              <option value="critic">CRITIC</option>
-              <option value="std">Odchylenie standardowe</option>
-            </select>
+            <label class="field" id="objectiveField" hidden><span>Metoda wag obiektywnych</span>
+              <select id="objectiveMethod">
+                <option value="entropy">Entropia</option>
+                <option value="critic">CRITIC</option>
+                <option value="std">Odchylenie standardowe</option>
+              </select></label>
             <div id="weightsList" class="weights-list"></div>
           </div>
         </div>
@@ -112,36 +130,36 @@
 
       <!-- 3 -->
       <section class="step" data-step="3">
-        <button class="step-head" type="button" aria-expanded="false">
-          <span class="num">3</span><span class="title">Obszar analizy</span><span class="summary" data-summary="3"></span>
-        </button>
+        <h2 class="step-h"><button class="step-head" type="button" aria-expanded="false">
+          <span class="num">3</span><span class="step-label"><span class="title">Obszar analizy</span><span class="summary" data-summary="3"></span></span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>
+        </button></h2>
         <div class="step-body">
           <p class="hint" id="areaHint">Znajdź miejscowość i użyj jej granicy albo narysuj obszar na mapie.</p>
           <div class="tool-row">
-            <button class="secondary" id="btnCity" type="button" hidden>Całe miasto</button>
-            <button class="secondary" id="btnDrawRect" type="button">Prostokąt</button>
-            <button class="secondary" id="btnDrawPoly" type="button">Wielokąt</button>
-            <button class="ghost" id="btnClearArea" type="button">Wyczyść</button>
+            <button class="btn btn--secondary btn--sm" id="btnCity" type="button" hidden>Całe miasto</button>
+            <button class="btn btn--secondary btn--sm" id="btnDrawRect" type="button">Prostokąt</button>
+            <button class="btn btn--secondary btn--sm" id="btnDrawPoly" type="button">Wielokąt</button>
+            <button class="btn btn--secondary btn--sm" id="btnClearArea" type="button">Wyczyść</button>
           </div>
           <div class="area-info" id="areaInfo">Nie wybrano obszaru.</div>
-          <p class="hint source" id="dataSource"></p>
+          <p class="source" id="dataSource"></p>
         </div>
       </section>
 
       <!-- 4 -->
       <section class="step" data-step="4">
-        <button class="step-head" type="button" aria-expanded="false">
-          <span class="num">4</span><span class="title">Punkty analizy</span><span class="summary" data-summary="4"></span>
-        </button>
+        <h2 class="step-h"><button class="step-head" type="button" aria-expanded="false">
+          <span class="num">4</span><span class="step-label"><span class="title">Punkty analizy</span><span class="summary" data-summary="4"></span></span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>
+        </button></h2>
         <div class="step-body">
           <div class="grid2">
             <label class="field"><span>Rozstaw siatki</span>
               <select id="spacing">
                 <option value="auto">Automatyczny</option>
-                <option>50</option><option>100</option><option>150</option><option>200</option>
-                <option>250</option><option>300</option><option>500</option><option>750</option><option>1000</option>
+                <option value="50">50 m</option><option value="100">100 m</option><option value="150">150 m</option><option value="200">200 m</option>
+                <option value="250">250 m</option><option value="300">300 m</option><option value="500">500 m</option><option value="750">750 m</option><option value="1000">1000 m</option>
               </select></label>
-            <label class="field"><span>Maks. odległość wyszukiwania</span>
+            <label class="field"><span>Maks. odległość</span>
               <select id="maxDistance">
                 <option value="750">750 m</option><option value="1000">1 km</option>
                 <option value="1500" selected>1,5 km</option><option value="2000">2 km</option>
@@ -158,86 +176,109 @@
 
       <!-- 5 -->
       <section class="step" data-step="5">
-        <button class="step-head" type="button" aria-expanded="false">
-          <span class="num">5</span><span class="title">Analiza wielokryterialna</span><span class="summary" data-summary="5"></span>
-        </button>
+        <h2 class="step-h"><button class="step-head" type="button" aria-expanded="false">
+          <span class="num">5</span><span class="step-label"><span class="title">Analiza wielokryterialna</span><span class="summary" data-summary="5"></span></span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>
+        </button></h2>
         <div class="step-body">
           <label class="field"><span>Metoda MCDA</span><select id="method"></select></label>
-          <p class="hint" id="methodHint"></p>
+          <details class="info">
+            <summary><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg>Jak liczy ta metoda</summary>
+            <p class="hint" id="methodHint"></p>
+          </details>
         </div>
       </section>
     </div>
 
     <footer class="run">
-      <div class="checklist" id="checklist"></div>
-      <button class="primary" id="btnRun" type="button">Generuj mapę preferencji</button>
+      <ul class="checklist" id="checklist" aria-label="Gotowość analizy"></ul>
+      <button class="btn btn--primary" id="btnRun" type="button">Generuj mapę preferencji</button>
       <div class="progress" id="progress" hidden>
         <div class="bar"><span id="progressBar"></span></div>
-        <p id="progressMsg"></p>
+        <p id="progressMsg" role="status"></p>
       </div>
-      <div class="alert error" id="runError" hidden></div>
+      <div class="alert error" id="runError" role="alert" hidden></div>
     </footer>
   </aside>
 
-  <main class="mapwrap">
-    <div id="map" aria-label="Mapa"></div>
+  <main class="mapwrap" id="top">
+    <div id="map" tabindex="-1" aria-label="Mapa"></div>
 
     <div class="search" role="search">
-      <input type="search" id="placeSearch" placeholder="Szukaj miejscowości lub adresu i naciśnij Enter" aria-label="Szukaj miejsca" autocomplete="off">
+      <label class="search-box">
+        <svg class="ic sb-ic" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="search" id="placeSearch" placeholder="Szukaj miejsca" aria-label="Szukaj miejsca, ulicy lub obiektu" aria-describedby="searchKey" autocomplete="off">
+        <kbd id="searchKey" aria-label="Zatwierdź klawiszem Enter">Enter</kbd>
+      </label>
       <ul id="placeResults" class="place-results" hidden></ul>
     </div>
 
-    <section class="results" id="results" hidden aria-label="Mapa preferencji">
-      <header>
-        <div>
+    <section class="results" id="results" hidden aria-labelledby="resTitle">
+      <header class="res-head">
+        <div class="res-title">
+          <p class="overline" id="resKicker">Mapa preferencji</p>
           <h2 id="resTitle">Mapa preferencji</h2>
-          <p id="resMeta"></p>
+          <p class="res-meta" id="resMeta"></p>
         </div>
-        <button class="ghost small" id="btnCollapse" type="button" aria-expanded="true" title="Zwiń">Zwiń</button>
+        <button class="icon-btn" id="btnCollapse" type="button" aria-expanded="true" aria-controls="resultsBody" aria-label="Zwiń panel wyników"><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></button>
       </header>
-      <div class="results-body">
+      <div class="results-body" id="resultsBody">
         <div class="stale" id="evalNote" hidden></div>
         <div class="stale" id="staleNote" hidden>Konfiguracja się zmieniła. Wygeneruj mapę ponownie, aby uwzględnić nowe kryteria, obszar lub siatkę.</div>
+
         <figure class="legend needs-eval">
-          <canvas id="legendHist" width="320" height="56" aria-hidden="true"></canvas>
+          <figcaption class="legend-title" id="legendLabel"></figcaption>
+          <canvas id="legendHist" width="320" height="40" aria-hidden="true"></canvas>
           <div class="legend-bar" id="legendBar"></div>
-          <figcaption class="legend-labels"><span id="legendWorst"></span><span id="legendLabel"></span><span id="legendBest"></span></figcaption>
-          <p class="excluded-note" id="excludedNote" hidden></p>
+          <div class="legend-ends"><span id="legendWorst"></span><span id="legendBest"></span></div>
+          <div class="legend-foot">
+            <p class="excluded-note" id="excludedNote" hidden></p>
+            <div class="segmented mini" id="scaleMode" role="radiogroup" aria-label="Skala kolorów">
+              <button type="button" role="radio" data-scale="value" class="active">Wartość</button>
+              <button type="button" role="radio" data-scale="rank">Ranking</button>
+            </div>
+          </div>
         </figure>
 
-        <div class="display">
-          <label class="field inline"><span>Paleta</span><select id="palette"></select></label>
-          <label class="check"><input type="checkbox" id="paletteReverse"> Odwróć</label>
-          <label class="field inline"><span>Skala</span><select id="scaleMode">
-            <option value="value">Wartość oceny</option>
-            <option value="rank">Pozycja w rankingu</option>
-          </select></label>
-          <label class="check" title="Interpolacja dwuliniowa między punktami siatki – tylko wizualna; ocena dotyczy punktów"><input type="checkbox" id="smooth" checked> Wygładzanie wizualne</label>
-          <label class="field inline grow"><span>Krycie</span><input type="range" id="opacity" min="0.2" max="1" step="0.05" value="0.72"></label>
-        </div>
+        <section class="block needs-eval">
+          <div class="block-head">
+            <h3>Najlepsze lokalizacje</h3>
+            <label class="check small"><input type="checkbox" id="showTop" checked> Na mapie</label>
+          </div>
+          <ol class="top" id="topList"></ol>
+        </section>
 
-        <div class="needs-eval">
+        <details class="block notes" id="warnBox" hidden>
+          <summary><svg class="ic warn-ic" aria-hidden="true"><use href="#i-warn"/></svg><span>Uwagi do danych</span><span class="count" id="warnCount"></span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="alerts" id="warnings"></div>
+        </details>
+
+        <section class="block needs-eval">
           <h3>Wagi użyte w ocenie</h3>
           <div class="usedweights" id="usedWeights"></div>
           <div class="usedweights-legend" id="usedWeightsLegend"></div>
-        </div>
-        <div class="alerts" id="warnings"></div>
+        </section>
 
-        <div class="needs-eval">
-          <h3>Najlepsze lokalizacje</h3>
-          <ol class="top" id="topList"></ol>
-          <label class="check"><input type="checkbox" id="showTop" checked> Pokaż na mapie</label>
-        </div>
+        <details class="block display-box">
+          <summary><span>Wyświetlanie</span><span class="count" id="displaySummary"></span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="display">
+            <label class="field"><span>Paleta</span><select id="palette"></select></label>
+            <label class="check"><input type="checkbox" id="paletteReverse"> Odwróć kolory</label>
+            <label class="check" title="Interpolacja dwuliniowa między punktami siatki – tylko wizualna; ocena dotyczy punktów"><input type="checkbox" id="smooth" checked> Wygładzanie wizualne</label>
+            <label class="field range"><span>Krycie warstwy</span><input type="range" id="opacity" min="0.2" max="1" step="0.05" value="0.8"></label>
+          </div>
+        </details>
 
-        <h3>Obiekty źródłowe</h3>
-        <div class="layers" id="layerToggles"></div>
-
-        <div class="exports">
-          <a class="secondary" id="expGeojson" href="#" download>GeoJSON</a>
-          <a class="secondary" id="expCsv" href="#" download>CSV</a>
-          <button class="secondary" id="expPng" type="button">PNG warstwy</button>
-        </div>
+        <details class="block">
+          <summary><span>Obiekty źródłowe</span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="layers" id="layerToggles"></div>
+        </details>
       </div>
+      <footer class="exports">
+        <span class="label">Pobierz</span>
+        <a class="btn btn--secondary btn--sm" id="expGeojson" download>GeoJSON</a>
+        <a class="btn btn--secondary btn--sm" id="expCsv" download>CSV</a>
+        <button class="btn btn--secondary btn--sm" id="expPng" type="button">PNG warstwy</button>
+      </footer>
     </section>
   </main>
 </div>
@@ -247,18 +288,20 @@
       <h2 id="wizTitle">RANCOM: porównanie kryteriów</h2>
       <p id="wizProgress"></p>
     </div>
-    <button type="button" class="ghost small" id="wizClose">Zamknij</button>
+    <button type="button" class="btn btn--secondary btn--sm" id="wizClose">Zamknij</button>
   </header>
   <div class="wiz-bar"><span id="wizBar"></span></div>
   <p class="wiz-q">Które kryterium jest ważniejsze w tej analizie?</p>
   <div class="wiz-options" id="wizOptions"></div>
   <footer>
-    <button type="button" class="secondary small" id="wizBack">Poprzednie pytanie</button>
+    <button type="button" class="btn btn--secondary btn--sm" id="wizBack">Poprzednie pytanie</button>
     <span class="hint">Klawisze: ← pierwsze, ↓ równie ważne, → drugie</span>
   </footer>
 </dialog>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 <script src="app.js"></script>
+<script src="dropdown.js"></script>
+<script type="module">import { init } from './assets/motion/motion.js'; init();</script>
 </body>
 </html>
