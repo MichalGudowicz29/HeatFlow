@@ -1,3 +1,8 @@
-data/gtfs/
-archive/
 .DS_Store
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.heatflow/
+wyniki/
+dist/
