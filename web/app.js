@@ -5,9 +5,12 @@
   "use strict";
 
   // ------------------------------------------------------------------ stałe
-  const CRIT_COLORS = ["#1f4e8c", "#7a4fa3", "#0e7c7b", "#b5651d", "#5a6e1a", "#a23b72",
-    "#3d5a80", "#8c564b", "#2a9d8f", "#6c757d", "#9c6644", "#386641", "#6d597a", "#bc4749", "#355070"];
+  // paleta kategorii: kolejne kolory wyraźnie różne w barwie i jasności; żaden nie jest zielenią akcji (#1f6b3a)
+  const CRIT_COLORS = ["#2f6fb3", "#e08214", "#c2366b", "#2a9d9a", "#8a6d1f", "#4d4d4d", "#d4542b", "#5a8a2e",
+    "#7fb0e0", "#b07a52", "#e2b42c", "#8c2f2f", "#5fbfa8", "#9a9a9a", "#1d3f6e"];
   const PALETTES = {
+    // domyślna: sekwencyjna, im ciemniej, tym lepiej; słabe obszary są półprzezroczyste, więc mapa pod nimi zostaje czytelna
+    intensity: { name: "Natężenie: jasne → ciemne", stops: ["#f7f0dc", "#f8d68e", "#f2a457", "#dd6431", "#b2321e", "#6e1611"], fade: true },
     heat: { name: "Chłodne → ciepłe", stops: ["#2c7bb6", "#abd9e9", "#ffffbf", "#fdae61", "#d7191c"] },
     rdylgn: { name: "Czerwony → zielony", stops: ["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60", "#1a9850"] },
     viridis: { name: "Viridis", stops: ["#440154", "#3b528b", "#21918c", "#5ec962", "#fde725"] },
@@ -24,7 +27,7 @@
     weights: { mode: "manual", objective: "entropy", manual: {}, ranking: {}, scoring: {}, answers: {}, rancomInput: "pairs", rancomResult: null },
     area: null, areaLabel: "",
     spacing: "auto", maxDistance: 1500, method: "spotis", exclude: ["water"],
-    display: { palette: "heat", reverse: false, opacity: 0.72, smooth: true, scale: "value" },
+    display: { palette: "intensity", reverse: false, opacity: 0.85, smooth: true, scale: "value" },
     job: null, result: null, resultSig: null, resultCriteria: null, evaluation: null,
   };
   let uidSeq = 1;
@@ -50,17 +53,28 @@
 
   // ------------------------------------------------------------------ mapa
   const map = L.map("map", { zoomControl: true, preferCanvas: true }).setView([53.43, 14.55], 12);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  // podkład Esri Light Gray Canvas (bez klucza API) w dwóch warstwach: tło pod mapą ocen,
+  // a warstwa samych napisów (Reference) nad nią – nazwy dzielnic i ulic zostają czytelne
+  map.createPane("heatPane").style.zIndex = 390;      // pod obrysem obszaru (overlayPane 400)
+  map.getPane("heatPane").classList.add("heat-pane");  // mix-blend-mode: multiply – ulice prześwitują przez kolor
+  map.createPane("labelsPane").style.zIndex = 460;     // nad warstwą ocen i terenami wyłączonymi
+  map.getPane("labelsPane").style.pointerEvents = "none";
+  const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
+  const ESRI_ATTR = 'Podkład © <a href="https://www.esri.com/">Esri</a>: Esri, HERE, Garmin, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, and the GIS user community';
+  L.tileLayer(ESRI + "World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+    maxZoom: 19, maxNativeZoom: 16, attribution: ESRI_ATTR,
+  }).addTo(map);
+  L.tileLayer(ESRI + "World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}", {
+    maxZoom: 19, maxNativeZoom: 16, pane: "labelsPane",
   }).addTo(map);
   map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
   const regionLayer = L.geoJSON(null, { style: { color: "#5b6b6d", weight: 1.5, fill: false, opacity: 0.8 }, interactive: false }).addTo(map);
-  const areaLayer = L.geoJSON(null, { style: { color: "#1b2b2f", weight: 2, dashArray: "6 5", fill: false } }).addTo(map);
+  const areaLayer = L.geoJSON(null, { style: { color: "#0a0a0a", weight: 1.6, dashArray: "5 4", fill: false, opacity: 0.85 } }).addTo(map);
   const previewRenderer = L.canvas({ padding: 0.3 });
   map.createPane("excludedPane").style.zIndex = 450;  // nad warstwą ocen, pod znacznikami
   const excludedLayer = L.geoJSON(null, {
     pane: "excludedPane", interactive: false,
-    style: { fillColor: "#b9c1c0", fillOpacity: 0.9, color: "#9aa5a4", weight: 0.6 },
+    style: { fillColor: "#c9cecd", fillOpacity: 0.92, color: "#aeb5b4", weight: 0.6 },
   }).addTo(map);
   const featureLayers = {};
   let heatOverlay = null, heatCanvas = null, topLayer = L.layerGroup().addTo(map), hoverMarker = null;
@@ -74,7 +88,7 @@
       $(".step-head", s).setAttribute("aria-expanded", open);
     });
   }
-  $$(".step-head").forEach((h) => h.addEventListener("click", () => openStep(h.parentElement.dataset.step)));
+  $$(".step-head").forEach((h) => h.addEventListener("click", () => openStep(h.closest(".step").dataset.step)));
 
   function updateSummaries() {
     const set = (n, txt, done) => {
@@ -107,8 +121,8 @@
       box.innerHTML = "";
       list.forEach((ex) => {
         const b = document.createElement("button");
-        b.type = "button"; b.className = "secondary small";
-        b.textContent = `Przykład: ${ex.name}`;
+        b.type = "button"; b.className = "btn btn--secondary btn--sm";
+        b.innerHTML = `<span class="ex-k">Przykład:</span> ${esc(ex.name)}`;
         b.addEventListener("click", async () => applyScenario(await api(`/api/examples/${encodeURIComponent(ex.file)}`)));
         box.appendChild(b);
       });
@@ -119,7 +133,7 @@
     const b = areaLayer.getBounds();
     if (!b.isValid()) return;
     const wide = window.innerWidth > 820;
-    const right = wide && !$("#results").hidden && !$("#results").classList.contains("collapsed") ? 370 : 30;
+    const right = wide && !$("#results").hidden && !$("#results").classList.contains("collapsed") ? $("#results").offsetWidth + 36 : 30;
     map.fitBounds(b, { paddingTopLeft: [30, wide ? 70 : 60], paddingBottomRight: [right, 30] });
   }
 
@@ -301,7 +315,7 @@
     if (!p.hidden) $("#catalogSearch").focus();
   });
   $$(".picker-tabs button").forEach((b) => b.addEventListener("click", () => {
-    $$(".picker-tabs button").forEach((x) => x.classList.toggle("active", x === b));
+    $$(".picker-tabs button").forEach((x) => { x.classList.toggle("active", x === b); x.setAttribute("aria-selected", x === b); });
     $$(".picker-pane").forEach((p) => { p.hidden = p.dataset.pane !== b.dataset.tab; });
   }));
   $("#catalogSearch").addEventListener("input", () => renderCatalog());
@@ -359,7 +373,7 @@
       const row = document.createElement("div");
       row.className = "ds";
       row.innerHTML = `<span>${esc(d.name)}<br><small>${fmt(d.n_features)} obiektów · ${esc(d.geometry_types.join(", "))}</small></span>
-        <button type="button" class="secondary small" data-a="add">Dodaj</button>
+        <button type="button" class="btn btn--secondary btn--sm" data-a="add">Dodaj</button>
         <button type="button" class="icon-btn" data-a="del" title="Usuń plik" aria-label="Usuń plik ${esc(d.name)}">×</button>`;
       $("[data-a=add]", row).addEventListener("click", () => addCriterion({
         name: d.name.replace(/\.[^.]+$/, ""), source: { type: "dataset", dataset_id: d.id, name: d.name }, method: "distance",
@@ -578,10 +592,10 @@
       b.setAttribute("aria-checked", b.dataset.mode === state.weights.mode);
     });
     const mode = state.weights.mode, inp = state.weights.rancomInput;
-    $("#objectiveMethod").hidden = mode !== "objective";
+    $("#objectiveField").hidden = mode !== "objective";
     $("#objectiveMethod").value = state.weights.objective;
     $("#rancomBox").hidden = mode !== "rancom";
-    $$("#rancomInput button").forEach((b) => b.classList.toggle("active", b.dataset.input === inp));
+    $$("#rancomInput button").forEach((b) => { b.classList.toggle("active", b.dataset.input === inp); b.setAttribute("aria-checked", b.dataset.input === inp); });
     $("#weightHint").textContent = {
       manual: "Wpisz istotność każdego kryterium. Wagi są normalizowane do sumy 100%.",
       rancom: {
@@ -727,8 +741,8 @@
         const [main, ...rest] = it.name.split(", ");
         const where = [it.type, ...rest.slice(0, 2)].filter(Boolean).join(", ");
         li.innerHTML = `${esc(main)}<small>${esc(where)}</small>
-          <div class="actions">${it.boundary ? '<button type="button" class="secondary small" data-a="boundary">Użyj granicy jako obszaru</button>' : ""}
-          <button type="button" class="ghost small" data-a="bbox">Użyj prostokąta</button></div>`;
+          <div class="actions">${it.boundary ? '<button type="button" class="btn btn--secondary btn--sm" data-a="boundary">Użyj granicy jako obszaru</button>' : ""}
+          <button type="button" class="btn btn--secondary btn--sm" data-a="bbox">Użyj prostokąta</button></div>`;
         li.addEventListener("click", (ev) => {
           const a = ev.target.closest("button")?.dataset.a;
           const b = it.bbox;
@@ -787,7 +801,7 @@
       ["Wagi", weightsValid()],
       ["Obszar", !!state.area],
     ];
-    $("#checklist").innerHTML = items.map(([t, ok]) => `<span class="${ok ? "ok" : ""}">${t}</span>`).join("");
+    $("#checklist").innerHTML = items.map(([t, ok]) => `<li class="${ok ? "ok" : ""}" title="${ok ? "Gotowe" : "Do uzupełnienia"}">${t}</li>`).join("");
     $("#btnRun").disabled = !items.every(([, ok]) => ok) || !!state.running;
   }
 
@@ -848,6 +862,8 @@
       state.resultSig = sig;
       state.resultCriteria = state.criteria.map((c) => c.uid);
       setProgress(1, `Gotowe – dane pobrane i policzone w ${fmt(full.result.duration_s, 1)} s.`);
+      $("#progress").classList.add("done");  // pasek znika, zostaje krótki status
+      state.develop = true;                   // nowa mapa „wywołuje się” raz
       await evaluateNow(true);
     } catch (e) {
       err.textContent = state.result ? `${e.message} Poprzedni wynik pozostaje na mapie.` : e.message;
@@ -861,6 +877,7 @@
 
   function setProgress(f, msg) {
     $("#progress").hidden = false;
+    if (f < 1) $("#progress").classList.remove("done");
     $("#progressBar").style.width = `${Math.round(f * 100)}%`;
     $("#progressMsg").textContent = msg || "";
   }
@@ -926,8 +943,10 @@
   function setExports(on) {
     const ev = state.evaluation;
     const ok = on && ev && state.job;
-    $("#expGeojson").href = ok ? `/api/analyses/${state.job.id}/export.geojson?eval=${ev.eval_id}` : "#";
-    $("#expCsv").href = ok ? `/api/analyses/${state.job.id}/export.csv?eval=${ev.eval_id}` : "#";
+    // bez wyniku linki nie mają adresu (zamiast „#”), więc nie prowadzą donikąd
+    const link = (sel, url) => { if (ok) $(sel).setAttribute("href", url); else $(sel).removeAttribute("href"); };
+    link("#expGeojson", ok && `/api/analyses/${state.job.id}/export.geojson?eval=${ev.eval_id}`);
+    link("#expCsv", ok && `/api/analyses/${state.job.id}/export.csv?eval=${ev.eval_id}`);
     $$(".exports > *").forEach((el) => { el.classList.toggle("disabled", !ok); el.setAttribute("aria-disabled", !ok); });
   }
   function onDataChanged() {
@@ -998,6 +1017,13 @@
     if (heatOverlay) { map.removeLayer(heatOverlay); heatOverlay = null; }
     if (!res || !ev) return;
     const g = res.grid, idx = gridIndex(res), good = goodness(ev), col = paletteFn();
+    // paleta „fade”: jasny koniec skali jest półprzezroczysty, ciemny (najlepszy) – pełny
+    const fade = PALETTES[state.display.palette].fade;
+    const alpha = (t) => {
+      if (!fade) return 255;
+      const p = state.display.reverse ? 1 - t : t;
+      return Math.round(255 * (0.32 + 0.68 * Math.min(1, Math.max(0, p) / 0.8)));
+    };
     const west = g.lon_min - g.dlon / 2, east = g.lon_min + (g.nx - 0.5) * g.dlon;
     const south = g.lat_min - g.dlat / 2, north = g.lat_min + (g.ny - 0.5) * g.dlat;
     const scale = Math.max(1, Math.min(8, Math.floor(1400 / Math.max(g.nx, g.ny))));
@@ -1030,7 +1056,7 @@
           t = sw > 0 ? sv / sw : val(nx0, ny0);
         }
         const rgb = col(t), o = (py * W + px) * 4;
-        img.data[o] = rgb[0]; img.data[o + 1] = rgb[1]; img.data[o + 2] = rgb[2]; img.data[o + 3] = 255;
+        img.data[o] = rgb[0]; img.data[o + 1] = rgb[1]; img.data[o + 2] = rgb[2]; img.data[o + 3] = alpha(t);
       }
     }
     // przycięcie do dokładnej granicy obszaru
@@ -1054,8 +1080,10 @@
     octx.restore();
     heatCanvas = out;
     heatOverlay = L.imageOverlay(out.toDataURL(), [[south, west], [north, east]], {
-      opacity: state.display.opacity, interactive: false, className: "heat-overlay",
+      opacity: state.display.opacity, interactive: false, pane: "heatPane",
+      className: "heat-overlay" + (state.develop ? " develop" : ""),
     }).addTo(map);
+    state.develop = false;
     areaLayer.bringToFront();
   }
 
@@ -1068,28 +1096,40 @@
     const better = ev.method.lower_is_better ? ev.summary.min : ev.summary.max;
     const worse = ev.method.lower_is_better ? ev.summary.max : ev.summary.min;
     const d = Math.abs(ev.summary.max - ev.summary.min) < 0.1 ? 4 : 3;
-    if (state.display.scale === "rank") {
-      $("#legendWorst").innerHTML = `gorzej <b>${fmt(Math.max(...ev.ranks))}.</b>`;
-      $("#legendBest").innerHTML = `<b>1.</b> lepiej`;
-      $("#legendLabel").textContent = `${ev.method.name}: pozycja w rankingu (percentyl)`;
+    // oś legendy zawsze biegnie „gorzej → lepiej”; liczby są drugorzędne, kierunek mówi słowo
+    const rank = state.display.scale === "rank";
+    $(".legend").classList.toggle("rank", rank);  // histogram percentyli jest płaski z definicji – chowamy go
+    $("#results").style.setProperty("--best", `rgb(${col(1).map(Math.round).join(",")})`);
+    if (rank) {
+      $("#legendWorst").innerHTML = `<span class="dirw">← gorzej</span><b>${fmt(Math.max(...ev.ranks))}. miejsce</b>`;
+      $("#legendBest").innerHTML = `<b>1. miejsce</b><span class="dirw">lepiej →</span>`;
+      $("#legendLabel").innerHTML = `${esc(ev.method.name)}: pozycja w rankingu<small>kolor według percentyla</small>`;
     } else {
-      $("#legendWorst").innerHTML = `gorzej <b>${fmt(worse, d)}</b>`;
-      $("#legendBest").innerHTML = `<b>${fmt(better, d)}</b> lepiej`;
-      $("#legendLabel").textContent = `${ev.method.name}: ${ev.method.score_label.toLowerCase()}${ev.method.lower_is_better ? " (mniej = lepiej)" : " (więcej = lepiej)"}`;
+      $("#legendWorst").innerHTML = `<span class="dirw">← gorzej</span><b>${fmt(worse, d)}</b>`;
+      $("#legendBest").innerHTML = `<b>${fmt(better, d)}</b><span class="dirw">lepiej →</span>`;
+      $("#legendLabel").innerHTML = `${esc(ev.method.name)}: ${esc(ev.method.score_label.toLowerCase())}<small>${ev.method.lower_is_better ? "mniej = lepiej" : "więcej = lepiej"}</small>`;
     }
+    $$("#scaleMode button").forEach((b) => {
+      const on = b.dataset.scale === (state.display.scale || "value");
+      b.classList.toggle("active", on); b.setAttribute("aria-checked", on);
+    });
     // histogram rozkładu ocen na osi „gorzej → lepiej”
     const cv = $("#legendHist"), ctx = cv.getContext("2d");
-    const dpr = window.devicePixelRatio || 1, Wc = cv.clientWidth || 300, Hc = 56;
+    const dpr = window.devicePixelRatio || 1, Wc = cv.clientWidth || 300, Hc = 40;
     cv.width = Wc * dpr; cv.height = Hc * dpr; ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, Wc, Hc);
     const bins = 40, h = new Array(bins).fill(0);
     goodness(ev).forEach((t) => { h[Math.max(0, Math.min(bins - 1, Math.floor(t * bins)))]++; });
     const mx = Math.max(...h) || 1, bw = Wc / bins;
     h.forEach((v, i) => {
-      const c = col((i + 0.5) / bins), bh = (v / mx) * (Hc - 4);
+      const c = col((i + 0.5) / bins), bh = v ? Math.max(1.5, (v / mx) * (Hc - 4)) : 0;
       ctx.fillStyle = `rgb(${c.map(Math.round).join(",")})`;
       ctx.fillRect(i * bw + 0.5, Hc - bh, bw - 1, bh);
     });
+    // linia bazowa, żeby jasne słupki nie znikały na bieli
+    ctx.fillStyle = "rgba(10,10,10,.18)";
+    ctx.fillRect(0, Hc - 1, Wc, 1);
+    renderDisplaySummary();
   }
 
   // ------------------------------------------------------------------ wynik: panel
@@ -1105,8 +1145,10 @@
     $("#resTitle").textContent = res.name;
     const g = res.grid;
     const osmDate = res.osm_timestamp ? new Date(res.osm_timestamp).toLocaleDateString("pl-PL") : null;
-    $("#resMeta").textContent = `${fmt(g.n_points)} punktów co ${fmt(g.spacing)} m, ${fmt(res.area_km2, res.area_km2 < 10 ? 2 : 1)} km²` +
-      (osmDate ? `, dane OSM z ${osmDate}` : "") + (res.duration_s != null ? `, policzono w ${fmt(res.duration_s, 1)} s` : "");
+    const where = state.region ? state.region.name : "";
+    $("#resKicker").textContent = ["Mapa preferencji", where, ev ? ev.method.name : null].filter(Boolean).join(" · ");
+    $("#resMeta").innerHTML = `${fmt(g.n_points)} pkt co ${fmt(g.spacing)} m · ${fmt(res.area_km2, res.area_km2 < 10 ? 2 : 1)} km²` +
+      (osmDate ? `<br>dane OSM z ${osmDate}` : "") + (res.duration_s != null ? ` · ${fmt(res.duration_s, 1)} s` : "");
     excludedLayer.clearLayers();
     const ex = res.excluded;
     if (ex && ex.geometry) excludedLayer.addData(ex.geometry);
@@ -1122,18 +1164,22 @@
     const uw = $("#usedWeights");
     uw.innerHTML = res.criteria.map((rc) => {
       const c = critById(rc.id), w = ev.weights[rc.id] || 0;
-      return w > 0 ? `<span title="${esc(c ? c.name : rc.name)}: ${fmt(w * 100, 1)}%" style="--c:${c ? c.color : "#999"};width:${(w * 100).toFixed(2)}%"></span>` : "";
+      return w > 0 ? `<span title="${esc(c ? c.name : rc.name)}: ${fmt(w * 100, 1)}%" style="--c:${c ? c.color : "#999"};flex:${w.toFixed(4)} 1 0"></span>` : "";
     }).join("");
     $("#usedWeightsLegend").innerHTML = res.criteria.map((rc) => {
       const c = critById(rc.id), w = ev.weights[rc.id] || 0;
-      return `<span style="--c:${c ? c.color : "#999"}">${esc(rc.name)} <b>${fmt(w * 100, w > 0 && w < 0.1 ? 1 : 0)}%</b></span>`;
+      return `<span class="n${w > 0 ? "" : " off"}" style="--c:${c ? c.color : "#999"}"><span>${esc(rc.name)}</span></span><b class="${w > 0 ? "" : "off"}">${fmt(w * 100, w > 0 && w < 0.1 ? 1 : 0)}%</b>`;
     }).join("");
     const warn = [...res.warnings];
     ev.excluded.forEach((id) => {
       const rc = resCrit(id);
       if (rc && !res.warnings.some((w) => w.includes(`„${rc.name}”`))) warn.push(`„${rc.name}” nie różnicuje lokalizacji w tym obszarze i zostało pominięte w ocenie.`);
     });
-    $("#warnings").innerHTML = warn.map((w) => `<div class="alert warn">${esc(w)}</div>`).join("");
+    // uwagi zwinięte w jedno „Uwagi do danych (n)”, żeby nie spychały rankingu
+    $("#warnings").innerHTML = warn.map((w) => `<p class="alert warn">${esc(w)}</p>`).join("");
+    $("#warnCount").textContent = warn.length;
+    $("#warnCount").setAttribute("aria-label", `${warn.length} ${warn.length === 1 ? "uwaga" : warn.length < 5 ? "uwagi" : "uwag"}`);
+    $("#warnBox").hidden = !warn.length;
     renderTop(ev);
     renderLayerToggles();
     setExports(!isStale());
@@ -1144,22 +1190,49 @@
     const idx = gridIndex(state.result);
     const order = ev.ranks.map((r, i) => [r, i]).sort((a, b) => a[0] - b[0]).slice(0, 10);
     const d = Math.abs(ev.summary.max - ev.summary.min) < 0.1 ? 4 : 3;
-    $("#topList").innerHTML = order.map(([r, i]) =>
-      `<li data-i="${i}"><span class="rk">${r}</span><span>${fmt(idx.lat[i], 5)}, ${fmt(idx.lon[i], 5)}</span><span class="sc">${fmt(ev.scores[i], d)}</span></li>`).join("");
-    $$("#topList li").forEach((li) => li.addEventListener("click", () => {
-      const i = Number(li.dataset.i);
-      map.setView([idx.lat[i], idx.lon[i]], Math.max(map.getZoom(), 15));
-      openPointPopup(i);
+    // wynik jest główną liczbą wiersza, współrzędne – drugorzędne
+    $("#topList").innerHTML = order.map(([r, i], k) =>
+      `<li class="${k === 0 ? "first" : ""}"><button type="button" class="top-row" data-i="${i}" aria-label="Miejsce ${r}: wynik ${fmt(ev.scores[i], d)}, ${fmt(idx.lat[i], 5)}, ${fmt(idx.lon[i], 5)}">
+        <span class="rk">${r}</span>
+        <span class="xy">${fmt(idx.lat[i], 5)}, ${fmt(idx.lon[i], 5)}</span><span class="sc">${fmt(ev.scores[i], d)}</span></button></li>`).join("");
+    $$("#topList .top-row").forEach((b) => b.addEventListener("click", () => {
+      const i = Number(b.dataset.i);
+      // punkt w środku widocznej części mapy (z lewej strony panelu wyników); popup po zakończeniu ruchu,
+      // inaczej automatyczne przesunięcie nie zadziała i popup schowa się pod panelem
+      const z = Math.max(map.getZoom(), 15);
+      const panelOpen = window.innerWidth > 820 && !$("#results").hidden && !$("#results").classList.contains("collapsed");
+      const shift = panelOpen ? ($("#results").offsetWidth + 24) / 2 : 0;
+      const pt = map.project([idx.lat[i], idx.lon[i]], z).add([shift, -120]);
+      map.once("moveend", () => openPointPopup(i));
+      map.setView(map.unproject(pt, z), z);
     }));
     topLayer.clearLayers();
+    topMarkers = {};
     if ($("#showTop").checked) {
-      order.forEach(([r, i]) => {
-        L.marker([idx.lat[i], idx.lon[i]], {
-          icon: L.divIcon({ className: "", html: `<div class="top-marker">${r}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] }),
-          title: `Miejsce ${r}`, keyboard: true,
+      // lepsze pozycje rysowane wyżej, gdy znaczniki się nakładają
+      order.slice().reverse().forEach(([r, i]) => {
+        const first = r === order[0][0];
+        const sz = first ? 30 : 24;
+        topMarkers[i] = L.marker([idx.lat[i], idx.lon[i]], {
+          icon: L.divIcon({ className: "", html: `<div class="top-marker${first ? " first" : ""}">${r}</div>`, iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2] }),
+          title: `Miejsce ${r}`, alt: `Miejsce ${r}`, keyboard: true, zIndexOffset: (1000 - r) * 10, riseOnHover: true,
         }).on("click", () => openPointPopup(i)).addTo(topLayer);
       });
     }
+    markSelected(selectedPoint);
+  }
+
+  // zaznaczenie jednego miejsca: ten sam stan w wierszu rankingu i na znaczniku
+  let topMarkers = {}, selectedPoint = -1;
+  function markSelected(i) {
+    selectedPoint = i;
+    $$("#topList .top-row").forEach((b) => b.setAttribute("aria-current", Number(b.dataset.i) === i ? "true" : "false"));
+    Object.entries(topMarkers).forEach(([k, m]) => {
+      const el = m.getElement && m.getElement();
+      const on = Number(k) === i;
+      if (el) el.firstElementChild?.classList.toggle("sel", on);
+      m.setZIndexOffset(on ? 100000 : (1000 - Number(el?.textContent || 0)) * 10);
+    });
   }
   $("#showTop").addEventListener("change", () => state.evaluation && renderTop(state.evaluation));
 
@@ -1215,27 +1288,32 @@
       if (ev.contributions && k !== undefined) {
         const v = ev.contributions[i][k];
         const frac = w > 0 ? Math.min(1, Math.max(0, v / w)) : 0;  // strata względna: 0 = najlepsza wartość, 1 = najgorsza
-        contrib = `<td class="n"><span class="cb" style="--c:${c ? c.color : "#777"};width:${Math.round(frac * 46)}px" title="${fmt(v, 4)}"></span></td>`;
+        // pełna ścieżka = najgorsza wartość w obszarze; wypełnienie od lewej
+        contrib = `<td class="loss"><span class="track" role="img" aria-label="Strata ${fmt(frac * 100, 0)}%" title="${fmt(v, 4)}"><span style="--c:${c ? c.color : "#777"};width:${(frac * 100).toFixed(1)}%"></span></span></td>`;
       } else if (ev.contributions) contrib = "<td></td>";
-      return `<tr><td>${esc(rc.name)}</td><td class="n">${fmtVal(rc, res.values[j][i])}</td><td class="n">${fmt(w * 100, 0)}%</td>${contrib}</tr>`;
+      return `<tr><td><span class="sw" style="--c:${c ? c.color : "#777"}"></span>${esc(rc.name)}</td><td class="n">${fmtVal(rc, res.values[j][i])}</td><td class="n">${fmt(w * 100, 0)}%</td>${contrib}</tr>`;
     }).join("");
     const html = `<div class="pp">
-      <h4>Miejsce ${ev.ranks[i]} z ${fmt(ev.ranks.length)}</h4>
-      <div class="meta">${ev.method.name}: ${fmt(ev.scores[i], d)} (${ev.method.lower_is_better ? "mniej = lepiej" : "więcej = lepiej"}) · ${fmt(idx.lat[i], 5)}, ${fmt(idx.lon[i], 5)}</div>
-      <table><thead><tr><th>Kryterium</th><th>Wartość</th><th>Waga</th>${ev.contributions ? "<th>Strata</th>" : ""}</tr></thead><tbody>${rows}</tbody></table>
+      <h4>Miejsce ${ev.ranks[i]} <span class="of">z ${fmt(ev.ranks.length)}</span></h4>
+      <div class="meta">${esc(ev.method.name)} <b>${fmt(ev.scores[i], d)}</b> (${ev.method.lower_is_better ? "mniej = lepiej" : "więcej = lepiej"})<br>${fmt(idx.lat[i], 5)}, ${fmt(idx.lon[i], 5)}</div>
+      <table><thead><tr><th>Kryterium</th><th class="n">Wartość</th><th class="n">Waga</th>${ev.contributions ? '<th class="loss">Strata</th>' : ""}</tr></thead><tbody>${rows}</tbody></table>
       ${ev.contributions ? '<div class="note">Strata: jak daleko punkt jest od najlepszej wartości kryterium w obszarze (pełny pasek = najgorsza wartość). Suma ważonych strat to wynik SPOTIS.</div>' : ""}
     </div>`;
     const wide = window.innerWidth > 820, panelOpen = !$("#results").hidden && !$("#results").classList.contains("collapsed");
-    L.popup({ maxWidth: 360, autoPanPaddingTopLeft: [20, 70], autoPanPaddingBottomRight: [wide && panelOpen ? 370 : 20, 20] }).setLatLng([idx.lat[i], idx.lon[i]]).setContent(html).openOn(map);
+    L.popup({ maxWidth: 380, minWidth: 300, autoPanPaddingTopLeft: [20, 70], autoPanPaddingBottomRight: [wide && panelOpen ? $("#results").offsetWidth + 36 : 20, 20] }).setLatLng([idx.lat[i], idx.lon[i]]).setContent(html).openOn(map);
     if (hoverMarker) map.removeLayer(hoverMarker);
-    hoverMarker = L.circleMarker([idx.lat[i], idx.lon[i]], { radius: 6, color: "#1b2b2f", weight: 2, fill: false }).addTo(map);
+    hoverMarker = L.circleMarker([idx.lat[i], idx.lon[i]], { radius: 7, color: "#1f6b3a", weight: 2.5, fill: false }).addTo(map);
+    markSelected(i);
   }
   map.on("click", (e) => {
     if (drawHandler && drawHandler.enabled()) return;
     const i = nodeAt(e.latlng);
     if (i >= 0 && state.evaluation && !isStale()) openPointPopup(i);
   });
-  map.on("popupclose", () => { if (hoverMarker) { map.removeLayer(hoverMarker); hoverMarker = null; } });
+  map.on("popupclose", () => {
+    if (hoverMarker) { map.removeLayer(hoverMarker); hoverMarker = null; }
+    markSelected(-1);
+  });
 
   // ------------------------------------------------------------------ ustawienia wyświetlania
   function renderPalettes() {
@@ -1243,22 +1321,34 @@
     $("#palette").value = state.display.palette;
     $("#paletteReverse").checked = state.display.reverse;
     $("#smooth").checked = state.display.smooth;
-    $("#scaleMode").value = state.display.scale || "value";
     $("#opacity").value = state.display.opacity;
+    $$("#scaleMode button").forEach((b) => {
+      const on = b.dataset.scale === (state.display.scale || "value");
+      b.classList.toggle("active", on); b.setAttribute("aria-checked", on);
+    });
+    renderDisplaySummary();
+  }
+  function renderDisplaySummary() {
+    const p = PALETTES[state.display.palette];
+    $("#displaySummary").textContent = p ? p.name.split(":")[0] + (state.display.reverse ? ", odwrócona" : "") : "";
   }
   $("#palette").addEventListener("change", (e) => { state.display.palette = e.target.value; redraw(); });
   $("#paletteReverse").addEventListener("change", (e) => { state.display.reverse = e.target.checked; redraw(); });
   $("#smooth").addEventListener("change", (e) => { state.display.smooth = e.target.checked; redraw(); });
-  $("#scaleMode").addEventListener("change", (e) => { state.display.scale = e.target.value; redraw(); });
+  $$("#scaleMode button").forEach((b) => b.addEventListener("click", () => { state.display.scale = b.dataset.scale; redraw(); renderPalettes(); }));
   $("#opacity").addEventListener("input", (e) => { state.display.opacity = Number(e.target.value); if (heatOverlay) heatOverlay.setOpacity(state.display.opacity); saveDraft(); });
-  function redraw() { saveDraft(); if (state.evaluation) { drawHeatmap(); drawLegend(); } }
+  function redraw() {
+    saveDraft(); renderDisplaySummary();
+    if (state.evaluation) { drawHeatmap(); drawLegend(); renderTop(state.evaluation); }
+  }
 
   $("#btnCollapse").addEventListener("click", (e) => {
     const p = $("#results");
     p.classList.toggle("collapsed");
     const collapsed = p.classList.contains("collapsed");
-    e.target.textContent = collapsed ? "Rozwiń" : "Zwiń";
-    e.target.setAttribute("aria-expanded", !collapsed);
+    const btn = e.currentTarget;
+    btn.setAttribute("aria-label", collapsed ? "Rozwiń panel wyników" : "Zwiń panel wyników");
+    btn.setAttribute("aria-expanded", !collapsed);
   });
 
   $("#expPng").addEventListener("click", () => {
@@ -1345,7 +1435,11 @@
     }
     setArea(area || null, s.area_label || (area ? "Obszar ze scenariusza" : ""), !fromDraft);
     renderCriteria(); renderWeights();
-    if (!fromDraft) openStep(2);
+    if (!fromDraft) {
+      openStep(2);
+      // panel od początku: zwinięty krok 1 i otwarty krok 2, a nie miejsce, w którym był przycisk przykładu
+      $("#panel").scrollTop = 0;
+    }
   }
 
   function saveDraft() {
@@ -1371,7 +1465,7 @@
     $("#areaHint").textContent = `Analiza obejmuje miasto ${r.name}. Wybierz całe miasto, znajdź osiedle albo narysuj obszar – zostanie przycięty do granicy miasta.`;
     $("#btnCity").hidden = false;
     $("#btnCity").textContent = `Cały ${r.name}`;
-    $("#placeSearch").placeholder = `Szukaj osiedla, ulicy lub obiektu (${r.name}) i naciśnij Enter`;
+    $("#placeSearch").placeholder = "Szukaj osiedla, ulicy lub obiektu";
   }
   $("#btnCity").addEventListener("click", () => { if (state.region) setArea(state.region.boundary, `Granica miasta ${state.region.name}`); });
 
